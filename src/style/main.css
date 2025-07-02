@@ -1,0 +1,47 @@
+header {
+    position: sticky;
+    top: 0;
+
+    background-color: var(--primary-color);
+    padding: 1rem 1rem;
+
+    font-size: 2rem;
+    font-weight: 700;
+
+    border-bottom: 1px solid var(--text-color);
+
+    z-index: 10;
+}
+
+main {
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+
+    flex: 1;
+    padding: 1rem;
+    gap: 1rem;
+
+    margin-right: 17rem;
+}
+
+footer {
+    background-color: var(--primary-color);
+    padding: 0.5rem 1rem;
+
+    border-top: 1px solid var(--text-color);
+}
+
+section.content {
+    width: 100%;
+    max-width: 60em;
+
+    padding: 0.25em 1.5em;
+
+    background-color: var(--primary-color);
+    border: 1px solid var(--text-color);
+    border-radius: 1.5rem;
+}

@@ -1,0 +1,35 @@
+aside#navigation {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+
+    top: 6rem;
+    right: 1rem;
+
+    width: 16rem;
+    height: fit-content;
+    padding: 1rem;
+    gap: 0.25rem;
+
+    background-color: var(--secondary-color);
+    border: 1px solid var(--text-color);
+    border-radius: 1rem;
+
+    z-index: 10;
+}
+
+a.nav-link {
+    display: block;
+
+    width: 100%;
+
+    color: var(--text-color);
+    text-decoration: none;
+
+    border-bottom: 1px solid var(--text-color);
+}
+
+a.nav-link.active {
+    color: var(--highlight-color);
+    font-weight: 700;
+}
