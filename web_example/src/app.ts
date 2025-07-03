@@ -8,7 +8,7 @@ export class App implements AsyncInit {
         console.log("🌟 App initialized");
 
         this.navigator = new FloatingNavigator();
-        await this.navigator.init();
+        this.navigator.init();
 
         return;
     }
