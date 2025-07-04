@@ -3,5 +3,5 @@
 </script>
 
 <Page title="About">
-    Cool.
+    <p>Cool.</p>
 </Page>

@@ -1,8 +1,8 @@
 <script lang="ts">
-    let { title = "Some Page", children } = $props();
+    let { title = "Some Page", children, style } = $props();
 </script>
 
-<section class="page">
+<section class="page" {style}>
     <span class="title">
         {title}
     </span>
@@ -13,12 +13,15 @@
 <style>
     .page {
         min-height: 100%;
-        min-width: 800px;
+        width: 100%;
+        max-width: 800px;
         padding: 1rem;
         
         background-color: var(--primary-color);
         border: 1px solid var(--border-color);
         border-radius: 8px;
+
+        box-shadow: 0 0px 4px 4px rgba(0, 0, 0, 0.5);
     }
 
     .title {

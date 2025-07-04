@@ -7,3 +7,9 @@
 
     <img src="https://picsum.photos/400/300" alt="Random" />
 </Page>
+
+<style>
+    img {
+        max-width: 100%;
+    }
+</style>

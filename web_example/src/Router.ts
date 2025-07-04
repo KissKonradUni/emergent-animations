@@ -1,4 +1,5 @@
 import HomeRoute from './routes/Home.svelte';
+import ExamplesRoute from './routes/Examples.svelte';
 import AboutRoute from './routes/About.svelte';
 
 import NotFoundRoute from './routes/NotFound.svelte';
@@ -11,9 +12,10 @@ export interface Route {
 }
 
 export const Routes: Record<string, Route> = {
-    '/'     : { component: HomeRoute,     title: 'Home'  },
-    '/about': { component: AboutRoute,    title: 'About' },
-    '/404'  : { component: NotFoundRoute, title: '404'   },
+    '/'        : { component: HomeRoute,     title: 'Home'     },
+    '/examples': { component: ExamplesRoute, title: 'Examples' },
+    '/about'   : { component: AboutRoute,    title: 'About'    },
+    '/404'     : { component: NotFoundRoute, title: '404'      },
 };
 let CurrentRoute: Route | null = Routes[globalThis.location.pathname] ?? Routes['/404'];
 

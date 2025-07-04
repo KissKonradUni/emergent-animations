@@ -8,7 +8,7 @@
 	<Router />
 </main>
 <footer>
-	
+	<span>Created by <a href="https://github.com/KissKonradUni/emergent-animations" target="_blank" rel="noopener noreferrer">Konrád Soma Kiss</a> using Svelte ❤️</span>
 </footer>
 
 <style>
@@ -21,15 +21,28 @@
 		flex: 1;
 		padding: 1rem;
 	}
+
+    @media screen and (max-width: 800px) {
+        main {
+            padding: 0.5rem 0;
+        }
+    }
 	
 	footer {
 		display: flex;
-		justify-content: center;
+        flex-direction: row;
+		justify-content: flex-end;
 		align-items: center;
 		
-		padding: 1rem;
+		padding: 0.5rem;
 		
 		background-color: var(--primary-color);
         border-top: 1px solid var(--border-color);
+
+        box-shadow: 0 0px 4px 4px rgba(0, 0, 0, 0.5);
 	}
+
+    footer a {
+        color: var(--accent-color);
+    }
 </style>
