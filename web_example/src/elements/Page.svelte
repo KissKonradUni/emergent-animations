@@ -1,5 +1,5 @@
 <script lang="ts">
-    let { title = "Some Page", children, style } = $props();
+    let { title = "Some Page", children, style = "" } = $props();
 </script>
 
 <section class="page" {style}>
@@ -14,7 +14,7 @@
     .page {
         min-height: 100%;
         width: 100%;
-        max-width: 800px;
+        max-width: 1280px;
         padding: 1rem;
         
         background-color: var(--primary-color);

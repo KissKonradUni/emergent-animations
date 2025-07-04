@@ -1,3 +1,5 @@
+import { CanvasImageTexture, CanvasSpritesheet } from "./CanvasImageTexture.ts";
+
 export class Vector2f {
     x: number;
     y: number;
@@ -14,6 +16,9 @@ interface Time {
 }
 
 export class CanvasWrapper {
+    private static idCounter: number = 0;
+    private instanceId: number;
+
     private canvas: HTMLCanvasElement;
     private wrapperElement: HTMLElement;
     private context: CanvasRenderingContext2D;
@@ -24,7 +29,12 @@ export class CanvasWrapper {
     private resolution: Vector2f = new Vector2f(1280, 720);
     private resolutionScale: number = 1.5;
 
+    private static debugTexture: CanvasSpritesheet = new CanvasSpritesheet('/cat-spritesheet.webp', 12, 14, 158);
+    private static debugTextureAlt: CanvasSpritesheet = new CanvasSpritesheet('/cat-alt-spritesheet.webp', 9, 8, 71);
+
     constructor(canvas: HTMLCanvasElement, wrapperElement: HTMLElement) {
+        this.instanceId = CanvasWrapper.idCounter++;
+        
         this.canvas = canvas;
         this.wrapperElement = wrapperElement;
         this.context = canvas.getContext('2d')!;
@@ -33,14 +43,12 @@ export class CanvasWrapper {
             throw new Error('Failed to get 2D context from canvas');
         }
 
-        console.log('CanvasWrapper initialized with canvas:', this.canvas);
         globalThis.requestAnimationFrame(this.onRenderFrame.bind(this));
 
         const onResizeListener = () => {
             const dpi = globalThis.devicePixelRatio || 2;
             this.canvas.width  = this.wrapperElement.clientWidth  * dpi * this.resolutionScale;
             this.canvas.height = this.wrapperElement.clientHeight * dpi * this.resolutionScale;
-            console.log(`Canvas resized to: ${this.canvas.width}x${this.canvas.height}`);
         };
         globalThis.addEventListener('resize', onResizeListener.bind(this));
         onResizeListener();
@@ -53,6 +61,22 @@ export class CanvasWrapper {
     
         // Set transformations to use virtual resolution
         this.setupTransformations();
+
+        // Draw the debug texture if it's loaded
+        if (CanvasWrapper.debugTexture.isLoaded()) {
+            for (let i = 0; i < 25; i++) {
+                const x = 300 + (i % 5) * 100;
+                const y = 100 + Math.floor(i / 5) * 100;
+
+                this.context.strokeRect(x, y, 100, 100);
+
+                const frame = Math.floor(now * 24) + Math.pow(i * 5, 2);
+                if (this.instanceId % 2 === 0)
+                    CanvasWrapper.debugTexture.drawFrame(this.context, frame, x, y, 100, 100);
+                else
+                    CanvasWrapper.debugTextureAlt.drawFrame(this.context, frame, x, y, 100, 100);
+            }
+        }
 
         // Draw debug information
         this.drawDebugInfo();
@@ -104,7 +128,7 @@ export class CanvasWrapper {
         this.context.font = '16px Consolas, monospace';
 
         // Draw title and separator
-        this.context.fillText(`Debug Info`, 10, 20);
+        this.context.fillText(`(${this.instanceId}) Debug Info`, 10, 20);
         
         this.context.beginPath();
         this.context.moveTo(10, 30);
