@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "web_example"
+		},
+		{
+			"path": "docs"
+		},
+		{
+			"path": "."
+		}
+	],
+	"settings": {}
+}
