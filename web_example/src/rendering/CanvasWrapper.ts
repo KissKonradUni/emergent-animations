@@ -22,26 +22,37 @@ export class CanvasWrapper {
     private resolution: Vector2f = new Vector2f(1280, 720);
     private resolutionScale: number = 1.0;
 
-    private static debugTexture: CanvasSpritesheet = new CanvasSpritesheet('/cat-alt.gif', 1, 1, 1);
-    private static debugSpritesheet: CanvasSpritesheet = new CanvasSpritesheet('/cat-spritesheet.webp', 12, 14, 158);
+    private static debugSpritesheet_01: CanvasSpritesheet = new CanvasSpritesheet('/cat-spritesheet.webp', 12, 14, 158);
+    private static debugSpritesheet_02: CanvasSpritesheet = new CanvasSpritesheet('/cat-alt-spritesheet.webp', 9, 8, 71);
+    private static debugSpritesheet_03: CanvasSpritesheet = new CanvasSpritesheet('/cat-alt-02-spritesheet.webp', 9, 8, 68);
 
-    private static debugObject: CanvasObject = new CanvasObject(
-        CanvasObject.image(CanvasWrapper.debugTexture),
-        new Vector2f(0, 100),
+    private static debugSprite_01: CanvasObject = new CanvasObject(
+        CanvasObject.sprite(CanvasWrapper.debugSpritesheet_01, () => Math.floor(CanvasWrapper.time.now * 24)),
+        new Vector2f(0, 200),
         new Vector2f(200, 200),
         new Vector2f(1.0, 1.0),
         new Vector2f(0.5, 0.0),
         0
     );
-    private static debugSprite: CanvasObject = new CanvasObject(
-        CanvasObject.sprite(CanvasWrapper.debugSpritesheet, () => Math.floor(CanvasWrapper.time.now * 24)),
-        new Vector2f(400, 250),
+    private static debugSprite_02: CanvasObject = new CanvasObject(
+        CanvasObject.sprite(CanvasWrapper.debugSpritesheet_02, () => Math.floor(CanvasWrapper.time.now * 24)),
+        new Vector2f(0, 150),
         new Vector2f(200, 200),
         new Vector2f(1.0, 1.0),
-        new Vector2f(0.5, 0.5),
+        new Vector2f(0.5, 0.0),
         0,
-        [CanvasWrapper.debugObject]
+        [CanvasWrapper.debugSprite_01]
     );
+    private static debugSprite_03: CanvasObject = new CanvasObject(
+        CanvasObject.sprite(CanvasWrapper.debugSpritesheet_03, () => Math.floor(CanvasWrapper.time.now * 24)),
+        new Vector2f(640, 100),
+        new Vector2f(200, 150),
+        new Vector2f(1.0, 1.0),
+        new Vector2f(0.5, 0.0),
+        0,
+        [CanvasWrapper.debugSprite_02]
+    );
+
 
     constructor(canvas: HTMLCanvasElement, wrapperElement: HTMLElement) {
         this.instanceId = CanvasWrapper.idCounter++;
@@ -76,9 +87,10 @@ export class CanvasWrapper {
         this.setupTransformations();
 
         // Draw a debug sprite
-        CanvasWrapper.debugSprite.rotation = Math.sin(now * 2) * 0.5; // Example rotation animation
-        CanvasWrapper.debugObject.rotation = Math.cos(now * 2) * 0.5; // Example rotation animation
-        CanvasWrapper.debugSprite.render(this.context);
+        CanvasWrapper.debugSprite_03.rotation = Math.sin(now * 2) * 0.75; 
+        CanvasWrapper.debugSprite_02.rotation = Math.sin(now * 3) * 0.5; 
+        CanvasWrapper.debugSprite_01.rotation = Math.sin(now * 4) * 0.5; 
+        CanvasWrapper.debugSprite_03.render(this.context);
 
         // Draw debug information
         this.drawDebugInfo();

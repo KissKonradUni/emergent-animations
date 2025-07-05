@@ -49,7 +49,12 @@ export class CanvasObject {
         this.children = children;
     }
     
-    public render(context: CanvasRenderingContext2D): void {
+    public render(context: CanvasRenderingContext2D, depth: number = 0): void {
+        if (depth > 10) {
+            console.warn('CanvasObject: Maximum render depth exceeded, stopping rendering to prevent stack overflow.');
+            return;
+        }
+        
         context.save();
         context.translate(
             this.position.x,
@@ -61,7 +66,7 @@ export class CanvasObject {
         this.renderFunction(this, context);
 
         this.children.forEach((child) => {
-            child.render(context);
+            child.render(context, depth + 1);
         });
 
         if (!CanvasObject.debugMode) {
