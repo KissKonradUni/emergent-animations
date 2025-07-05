@@ -5,5 +5,4 @@
 
 <Page title="Examples">
     <Canvas></Canvas>
-    <Canvas></Canvas>
 </Page>

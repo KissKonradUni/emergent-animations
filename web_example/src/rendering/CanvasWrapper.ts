@@ -30,7 +30,6 @@ export class CanvasWrapper {
     private resolutionScale: number = 1.5;
 
     private static debugTexture: CanvasSpritesheet = new CanvasSpritesheet('/cat-spritesheet.webp', 12, 14, 158);
-    private static debugTextureAlt: CanvasSpritesheet = new CanvasSpritesheet('/cat-alt-spritesheet.webp', 9, 8, 71);
 
     constructor(canvas: HTMLCanvasElement, wrapperElement: HTMLElement) {
         this.instanceId = CanvasWrapper.idCounter++;
@@ -64,18 +63,16 @@ export class CanvasWrapper {
 
         // Draw the debug texture if it's loaded
         if (CanvasWrapper.debugTexture.isLoaded()) {
-            for (let i = 0; i < 25; i++) {
-                const x = 300 + (i % 5) * 100;
-                const y = 100 + Math.floor(i / 5) * 100;
+            const x = 300;
+            const y = 100;
 
-                this.context.strokeRect(x, y, 100, 100);
+            // Offset the frame based on time
+            const frame = Math.floor(now * 24);
+            CanvasWrapper.debugTexture.drawFrame(this.context, frame, x, y, 512, 512);
 
-                const frame = Math.floor(now * 24) + Math.pow(i * 5, 2);
-                if (this.instanceId % 2 === 0)
-                    CanvasWrapper.debugTexture.drawFrame(this.context, frame, x, y, 100, 100);
-                else
-                    CanvasWrapper.debugTextureAlt.drawFrame(this.context, frame, x, y, 100, 100);
-            }
+            // Draw a white border around each frame
+            this.context.strokeStyle = 'white';
+            this.context.strokeRect(x, y, 512, 512);
         }
 
         // Draw debug information
