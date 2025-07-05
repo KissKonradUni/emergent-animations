@@ -1,14 +1,6 @@
-import { CanvasImageTexture, CanvasSpritesheet } from "./CanvasImageTexture.ts";
-
-export class Vector2f {
-    x: number;
-    y: number;
-
-    constructor(x: number = 0, y: number = 0) {
-        this.x = x;
-        this.y = y;
-    }
-}
+import { CanvasSpritesheet } from "./CanvasImageTexture.ts";
+import { Vector2f } from "./CanvasMath.ts";
+import { CanvasObject } from "./CanvasObject.ts";
 
 interface Time {
     delta: number;
@@ -19,17 +11,37 @@ export class CanvasWrapper {
     private static idCounter: number = 0;
     private instanceId: number;
 
-    private canvas: HTMLCanvasElement;
-    private wrapperElement: HTMLElement;
-    private context: CanvasRenderingContext2D;
-    private time: Time = {
+    private static time: Time = {
         delta: 0,
         now: 0
     };
-    private resolution: Vector2f = new Vector2f(1280, 720);
-    private resolutionScale: number = 1.5;
 
-    private static debugTexture: CanvasSpritesheet = new CanvasSpritesheet('/cat-spritesheet.webp', 12, 14, 158);
+    private canvas: HTMLCanvasElement;
+    private wrapperElement: HTMLElement;
+    private context: CanvasRenderingContext2D;
+    private resolution: Vector2f = new Vector2f(1280, 720);
+    private resolutionScale: number = 1.0;
+
+    private static debugTexture: CanvasSpritesheet = new CanvasSpritesheet('/cat-alt.gif', 1, 1, 1);
+    private static debugSpritesheet: CanvasSpritesheet = new CanvasSpritesheet('/cat-spritesheet.webp', 12, 14, 158);
+
+    private static debugObject: CanvasObject = new CanvasObject(
+        CanvasObject.image(CanvasWrapper.debugTexture),
+        new Vector2f(0, 100),
+        new Vector2f(200, 200),
+        new Vector2f(1.0, 1.0),
+        new Vector2f(0.5, 0.0),
+        0
+    );
+    private static debugSprite: CanvasObject = new CanvasObject(
+        CanvasObject.sprite(CanvasWrapper.debugSpritesheet, () => Math.floor(CanvasWrapper.time.now * 24)),
+        new Vector2f(400, 250),
+        new Vector2f(200, 200),
+        new Vector2f(1.0, 1.0),
+        new Vector2f(0.5, 0.5),
+        0,
+        [CanvasWrapper.debugObject]
+    );
 
     constructor(canvas: HTMLCanvasElement, wrapperElement: HTMLElement) {
         this.instanceId = CanvasWrapper.idCounter++;
@@ -37,6 +49,8 @@ export class CanvasWrapper {
         this.canvas = canvas;
         this.wrapperElement = wrapperElement;
         this.context = canvas.getContext('2d')!;
+        
+        CanvasObject.setDebugMode(true);
 
         if (!this.context) {
             throw new Error('Failed to get 2D context from canvas');
@@ -55,25 +69,16 @@ export class CanvasWrapper {
 
     private onRenderFrame(timestamp: number): void {
         const now = timestamp / 1000;
-        this.time.delta = now - this.time.now;
-        this.time.now = now;
+        CanvasWrapper.time.delta = now - CanvasWrapper.time.now;
+        CanvasWrapper.time.now = now;
     
         // Set transformations to use virtual resolution
         this.setupTransformations();
 
-        // Draw the debug texture if it's loaded
-        if (CanvasWrapper.debugTexture.isLoaded()) {
-            const x = 300;
-            const y = 100;
-
-            // Offset the frame based on time
-            const frame = Math.floor(now * 24);
-            CanvasWrapper.debugTexture.drawFrame(this.context, frame, x, y, 512, 512);
-
-            // Draw a white border around each frame
-            this.context.strokeStyle = 'white';
-            this.context.strokeRect(x, y, 512, 512);
-        }
+        // Draw a debug sprite
+        CanvasWrapper.debugSprite.rotation = Math.sin(now * 2) * 0.5; // Example rotation animation
+        CanvasWrapper.debugObject.rotation = Math.cos(now * 2) * 0.5; // Example rotation animation
+        CanvasWrapper.debugSprite.render(this.context);
 
         // Draw debug information
         this.drawDebugInfo();
@@ -134,8 +139,8 @@ export class CanvasWrapper {
         this.context.stroke();
 
         // Draw information
-        this.context.fillText(`Delta : ${(this.time.delta * 1000).toFixed(2).padStart(5, "0")}ms`, 10, 50);
-        this.context.fillText(`Now   : ${this.time.now.toFixed(2)}s`, 10, 70);
+        this.context.fillText(`Delta : ${(CanvasWrapper.time.delta * 1000).toFixed(2).padStart(5, "0")}ms`, 10, 50);
+        this.context.fillText(`Now   : ${CanvasWrapper.time.now.toFixed(2)}s`, 10, 70);
         this.context.fillText(`Canvas: ${this.canvas.width}x${this.canvas.height}`, 10, 90);
     }
 }

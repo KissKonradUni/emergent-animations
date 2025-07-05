@@ -1,7 +1,10 @@
+import { Vector2f } from "./CanvasMath.ts";
+
 export class CanvasImageTexture {
     protected static cache: Map<string, HTMLImageElement> = new Map();
     protected image: HTMLImageElement;
     protected loaded: boolean = false;
+    protected size: Vector2f = new Vector2f(-1, -1);
 
     constructor(url: string) {
         this.image = CanvasImageTexture.cache.get(url) || new Image();
@@ -13,6 +16,7 @@ export class CanvasImageTexture {
 
         this.image.onload = () => {
             this.loaded = true;
+            this.size.set(this.image.width, this.image.height);
         };
     }
 
