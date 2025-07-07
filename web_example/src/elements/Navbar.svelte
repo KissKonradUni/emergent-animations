@@ -8,6 +8,7 @@
     </Link>
 	<nav>
 		<Link cssClass="navbar-link" href="/">Home</Link>
+        <Link cssClass="navbar-link" href="/thesis">Thesis</Link>
 		<Link cssClass="navbar-link" href="/examples">Examples</Link>
 		<Link cssClass="navbar-link" href="/about">About</Link>
 	</nav>

@@ -1,4 +1,5 @@
 import HomeRoute from './routes/Home.svelte';
+import ThesisRoute from './routes/Thesis.svelte';
 import ExamplesRoute from './routes/Examples.svelte';
 import AboutRoute from './routes/About.svelte';
 
@@ -13,6 +14,7 @@ export interface Route {
 
 export const Routes: Record<string, Route> = {
     '/'        : { component: HomeRoute,     title: 'Home'     },
+    '/thesis'  : { component: ThesisRoute,   title: 'Thesis'   }, 
     '/examples': { component: ExamplesRoute, title: 'Examples' },
     '/about'   : { component: AboutRoute,    title: 'About'    },
     '/404'     : { component: NotFoundRoute, title: '404'      },

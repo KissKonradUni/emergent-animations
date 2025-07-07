@@ -1,0 +1,13 @@
+# LaTeX
+
+output/main.aux
+output/main.bbl
+output/main.bcf
+output/main.blg
+output/main.fdb_latexmk
+output/main.fls
+output/main.log
+output/main.out
+output/main.pdf
+output/main.run.xml
+output/main.toc

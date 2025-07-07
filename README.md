@@ -1,5 +1,5 @@
-# Emergent Animation Systems
-**From Interpolation to Procedural Motion**
+# Emergent animation systems
+**From interpolation to procedural motion**
 
 This project explores how animation systems can be built using simple rules, gradually increasing in complexity from basic interpolation techniques to emergent, procedural movement.
 
