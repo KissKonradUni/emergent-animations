@@ -10,15 +10,22 @@ const Callbacks: Array<(route: Route | null) => void> = [];
 export interface Route {
     component: typeof HomeRoute | null;
     title: string;
+    href: string;
 }
 
-export const Routes: Record<string, Route> = {
-    '/'        : { component: HomeRoute,     title: 'Home'     },
-    '/thesis'  : { component: ThesisRoute,   title: 'Thesis'   }, 
-    '/examples': { component: ExamplesRoute, title: 'Examples' },
-    '/about'   : { component: AboutRoute,    title: 'About'    },
-    '/404'     : { component: NotFoundRoute, title: '404'      },
-};
+const RouteArray = [
+    { href: '/'        , component: HomeRoute,     title: 'Home'    },
+    { href: '/thesis'  , component: ThesisRoute,   title: 'Thesis'  },
+    { href: '/examples', component: ExamplesRoute, title: 'Examples'},
+    { href: '/about'   , component: AboutRoute,    title: 'About'   },
+    { href: '/404'     , component: NotFoundRoute, title: '404'     },
+];
+
+export const Routes: Record<string, Route> = RouteArray.reduce((collection: Record<string, Route>, route) => {
+    collection[route.href] = route;
+    return collection;
+}, {});
+
 let CurrentRoute: Route | null = Routes[globalThis.location.pathname] ?? Routes['/404'];
 
 export function Navigate(path: string) {

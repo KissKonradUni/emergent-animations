@@ -4,8 +4,24 @@
     let CurrentRoute = $state(getCurrentRoute());
     let CurrentComponent: typeof CurrentRoute.component | null = $derived(CurrentRoute?.component);
     let CurrentTitle: string = $derived(CurrentRoute?.title || '*');
+    let animation = null;
+    
     onRouteChange((route) => {
-        CurrentRoute = route;
+        if (CurrentRoute.href == route.href) {
+            return; 
+        }
+
+        if (animation) {
+            clearTimeout(animation);
+        }
+
+        document.getElementById('current-page').classList.add('fade-out');
+
+        animation = setTimeout(() => {
+            CurrentRoute = route;
+
+            document.getElementById('current-page').classList.remove('fade-out');
+        }, 150);
     });
 </script>
 
@@ -13,4 +29,5 @@
     <title>Emergent Animations - {CurrentTitle}</title>
 </svelte:head>
 
-<CurrentComponent></CurrentComponent>
+<CurrentComponent>
+</CurrentComponent>

@@ -7,7 +7,7 @@
     let { title = "Some Page", children, style = "", extra = null as ExtraTitle } = $props();
 </script>
 
-<section class="page" {style}>
+<section class="page" {style} id="current-page">
     <span class="title">
         {title}
         {#if extra}
@@ -32,6 +32,8 @@
         border-radius: 8px;
 
         box-shadow: 0 0px 4px 4px rgba(0, 0, 0, 0.5);
+
+        animation: fadeIn 0.15s ease-in-out forwards;
     }
 
     .title {
@@ -47,6 +49,32 @@
         color: var(--text-color);
 
         border-bottom: 1px solid var(--border-color);
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            translate: 0 -10px;
+        }
+        to {
+            opacity: 1;
+            translate: 0 0;
+        }
+    }
+
+    :global(.page.fade-out) {
+        animation: fadeOut 0.15s ease-in-out forwards;
+    }
+
+    @keyframes fadeOut {
+        from {
+            opacity: 1;
+            translate: 0 0;
+        }
+        to {
+            opacity: 0;
+            translate: 0 10px;
+        }
     }
     
     a {
