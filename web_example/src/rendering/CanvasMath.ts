@@ -47,6 +47,10 @@ export class Vector2f {
         return this.x * other.x + this.y * other.y;
     }
 
+    clone(): Vector2f {
+        return new Vector2f(this.x, this.y);
+    }
+
     static zero(): Vector2f {
         return new Vector2f(0, 0);
     }

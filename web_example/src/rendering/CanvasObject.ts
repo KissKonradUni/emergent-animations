@@ -94,6 +94,25 @@ export class CanvasObject {
         context.restore();
     }
 
+    public createCopy(copyChildren: boolean): CanvasObject {
+        const copy = new CanvasObject(
+            this.renderFunction,
+            this.position.clone(),
+            this.size.clone(),
+            this.scale.clone(),
+            this.pivot.clone(),
+            this.rotation,
+        );
+        
+        if (copyChildren) {
+            copy.children = this.children.map(child => child.createCopy(true));
+        } else {
+            copy.children = [];
+        }
+        
+        return copy;
+    }
+
     public static setDebugMode(enabled: boolean): void {
         CanvasObject.debugMode = enabled;
     }

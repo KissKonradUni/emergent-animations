@@ -39,17 +39,16 @@
     }
 
     :global(.navbar-link) {
-        color: var(--text-color);
-        text-decoration: none;
+        color: var(--accent-color);
         font-weight: bold;
     }
 
     :global(.navbar-link:hover) {
-        text-decoration: underline;
+        color: var(--light-accent-color);
     }
 
     :global(.navbar-link:active) {
-        color: var(--accent-color);
+        color: var(--text-color);
     }
 
     :global(.navbar-title) {

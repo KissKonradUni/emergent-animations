@@ -44,5 +44,10 @@
 
     footer a {
         color: var(--accent-color);
+        font-weight: bold;
+    }
+
+    footer a:hover {
+        color: var(--light-accent-color);
     }
 </style>

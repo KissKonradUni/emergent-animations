@@ -53,7 +53,6 @@ export class CanvasWrapper {
         [CanvasWrapper.debugSprite_02]
     );
 
-
     constructor(canvas: HTMLCanvasElement, wrapperElement: HTMLElement) {
         this.instanceId = CanvasWrapper.idCounter++;
         
