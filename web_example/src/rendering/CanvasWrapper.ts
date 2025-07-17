@@ -2,19 +2,17 @@ import { CanvasSpritesheet } from "./CanvasImageTexture.ts";
 import { Vector2f } from "./CanvasMath.ts";
 import { CanvasObject } from "./CanvasObject.ts";
 
-interface Time {
-    delta: number;
-    now: number;
+class Time {
+    public delta: number = 0;
+    public now  : number = 0;
 }
 
 export class CanvasWrapper {
     private static idCounter: number = 0;
     private instanceId: number;
 
-    private static time: Time = {
-        delta: 0,
-        now: 0
-    };
+    private time: Time = new Time();
+    private startTime: number = 0;
 
     private canvas: HTMLCanvasElement;
     private wrapperElement: HTMLElement;
@@ -22,40 +20,46 @@ export class CanvasWrapper {
     private resolution: Vector2f = new Vector2f(1280, 720);
     private resolutionScale: number = 1.0;
 
+    // #region Debug Sprites
+
     private static debugSpritesheet_01: CanvasSpritesheet = new CanvasSpritesheet('/cat-spritesheet.webp', 12, 14, 158);
     private static debugSpritesheet_02: CanvasSpritesheet = new CanvasSpritesheet('/cat-alt-spritesheet.webp', 9, 8, 71);
     private static debugSpritesheet_03: CanvasSpritesheet = new CanvasSpritesheet('/cat-alt-02-spritesheet.webp', 9, 8, 68);
 
-    private static debugSprite_01: CanvasObject = new CanvasObject(
-        CanvasObject.sprite(CanvasWrapper.debugSpritesheet_01, () => Math.floor(CanvasWrapper.time.now * 24)),
+    private debugSprite_01: CanvasObject = new CanvasObject(
+        CanvasObject.sprite(CanvasWrapper.debugSpritesheet_01, () => Math.floor(this.time.now * 24)),
         new Vector2f(0, 200),
         new Vector2f(200, 200),
         new Vector2f(1.0, 1.0),
         new Vector2f(0.5, 0.0),
         0
     );
-    private static debugSprite_02: CanvasObject = new CanvasObject(
-        CanvasObject.sprite(CanvasWrapper.debugSpritesheet_02, () => Math.floor(CanvasWrapper.time.now * 24)),
+    private debugSprite_02: CanvasObject = new CanvasObject(
+        CanvasObject.sprite(CanvasWrapper.debugSpritesheet_02, () => Math.floor(this.time.now * 24)),
         new Vector2f(0, 150),
         new Vector2f(200, 200),
         new Vector2f(1.0, 1.0),
         new Vector2f(0.5, 0.0),
         0,
-        [CanvasWrapper.debugSprite_01]
+        [this.debugSprite_01]
     );
-    private static debugSprite_03: CanvasObject = new CanvasObject(
-        CanvasObject.sprite(CanvasWrapper.debugSpritesheet_03, () => Math.floor(CanvasWrapper.time.now * 24)),
+    private debugSprite_03: CanvasObject = new CanvasObject(
+        CanvasObject.sprite(CanvasWrapper.debugSpritesheet_03, () => Math.floor(this.time.now * 24)),
         new Vector2f(640, 100),
         new Vector2f(200, 150),
         new Vector2f(1.0, 1.0),
         new Vector2f(0.5, 0.0),
         0,
-        [CanvasWrapper.debugSprite_02]
+        [this.debugSprite_02]
     );
+
+    // #endregion
 
     constructor(canvas: HTMLCanvasElement, wrapperElement: HTMLElement) {
         this.instanceId = CanvasWrapper.idCounter++;
         
+        this.startTime = -1;
+
         this.canvas = canvas;
         this.wrapperElement = wrapperElement;
         this.context = canvas.getContext('2d')!;
@@ -78,18 +82,23 @@ export class CanvasWrapper {
     }
 
     private onRenderFrame(timestamp: number): void {
-        const now = timestamp / 1000;
-        CanvasWrapper.time.delta = now - CanvasWrapper.time.now;
-        CanvasWrapper.time.now = now;
+        const frame = timestamp / 1000;
+
+        if (this.startTime < 0) {
+            this.startTime = frame;
+        }
+
+        this.time.delta = frame - this.startTime - this.time.now;
+        this.time.now   = frame - this.startTime;
     
         // Set transformations to use virtual resolution
         this.setupTransformations();
 
         // Draw a debug sprite
-        CanvasWrapper.debugSprite_03.rotation = Math.sin(now * 2) * 0.75; 
-        CanvasWrapper.debugSprite_02.rotation = Math.sin(now * 3) * 0.5; 
-        CanvasWrapper.debugSprite_01.rotation = Math.sin(now * 4) * 0.5; 
-        CanvasWrapper.debugSprite_03.render(this.context);
+        this.debugSprite_03.rotation = Math.sin(this.time.now * 2) * 0.75; 
+        this.debugSprite_02.rotation = Math.sin(this.time.now * 3) * 0.5; 
+        this.debugSprite_01.rotation = Math.sin(this.time.now * 4) * 0.5; 
+        this.debugSprite_03.render(this.context);
 
         // Draw debug information
         this.drawDebugInfo();
@@ -150,8 +159,8 @@ export class CanvasWrapper {
         this.context.stroke();
 
         // Draw information
-        this.context.fillText(`Delta : ${(CanvasWrapper.time.delta * 1000).toFixed(2).padStart(5, "0")}ms`, 10, 50);
-        this.context.fillText(`Now   : ${CanvasWrapper.time.now.toFixed(2)}s`, 10, 70);
+        this.context.fillText(`Delta : ${(this.time.delta * 1000).toFixed(2).padStart(5, "0")}ms`, 10, 50);
+        this.context.fillText(`Now   : ${this.time.now.toFixed(2)}s`, 10, 70);
         this.context.fillText(`Canvas: ${this.canvas.width}x${this.canvas.height}`, 10, 90);
     }
 }
