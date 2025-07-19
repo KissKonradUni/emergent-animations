@@ -1,9 +1,11 @@
 import HomeRoute from './routes/Home.svelte';
+import NotFoundRoute from './routes/NotFound.svelte';
+
 import ThesisRoute from './routes/Thesis.svelte';
-import ExamplesRoute from './routes/Examples.svelte';
 import AboutRoute from './routes/About.svelte';
 
-import NotFoundRoute from './routes/NotFound.svelte';
+import ExamplesRoute from './routes/examples/Examples.svelte';
+import FrameAnimations from './routes/examples/FrameAnimations.svelte';
 
 const Callbacks: Array<(route: Route | null) => void> = [];
 
@@ -15,10 +17,13 @@ export interface Route {
 
 const RouteArray = [
     { href: '/'        , component: HomeRoute,     title: 'Home'    },
-    { href: '/thesis'  , component: ThesisRoute,   title: 'Thesis'  },
-    { href: '/examples', component: ExamplesRoute, title: 'Examples'},
-    { href: '/about'   , component: AboutRoute,    title: 'About'   },
     { href: '/404'     , component: NotFoundRoute, title: '404'     },
+
+    { href: '/thesis'  , component: ThesisRoute,   title: 'Thesis'  },
+    { href: '/about'   , component: AboutRoute,    title: 'About'   },
+
+    { href: '/examples', component: ExamplesRoute, title: 'Examples'},
+    { href: '/examples/frame-animations', component: FrameAnimations, title: 'Frame Animations' },
 ];
 
 export const Routes: Record<string, Route> = RouteArray.reduce((collection: Record<string, Route>, route) => {

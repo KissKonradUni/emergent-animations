@@ -8,7 +8,12 @@
 	<Router />
 </main>
 <footer>
-	<span>Created by <a href="https://github.com/KissKonradUni/emergent-animations" target="_blank" rel="noopener noreferrer">Konrád Soma Kiss</a> using Svelte ❤️</span>
+	<span>
+        Created by 
+        <a href="https://github.com/KissKonradUni/emergent-animations" target="_blank" rel="noopener noreferrer">Konrád Soma Kiss</a>
+        using 
+        <a href="https://svelte.dev" target="_blank" rel="noopener noreferrer">Svelte</a>
+        ❤️</span>
 </footer>
 
 <style>

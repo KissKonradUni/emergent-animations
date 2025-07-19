@@ -68,9 +68,17 @@
             padding: 0.5rem 1rem;
         }
 
+        nav {
+            gap: 0.5rem;
+        }
+
         :global(.navbar-title) {
             font-size: 1.33rem;
             white-space: inherit;
+        }
+
+        :global(.navbar-link) {
+            font-size: 0.9rem;
         }
     }
 </style>

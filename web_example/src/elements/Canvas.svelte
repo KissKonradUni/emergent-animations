@@ -1,5 +1,4 @@
 <script lang="ts">
-    import Page from "./Page.svelte";
     import { onMount } from "svelte";
     import { CanvasWrapper } from "../rendering/CanvasWrapper";
 
@@ -52,11 +51,9 @@
 
         width: 100%;
         /* Hack: I calculated this. Don't ask me how. */
-        height: calc(100vh - 14.5rem);
+        height: calc(100vh - 16.5rem);
 
         background-color: var(--secondary-color);
-        border: 1px solid var(--border-color);
-        border-radius: 4px;
     }
 
     canvas.fullscreen {
@@ -67,7 +64,7 @@
 
     @media screen and (max-width: 800px) {
         canvas {
-            height: calc(100vh - 13.5rem);
+            height: calc(100vh - 15.5rem);
         }
     }
 
