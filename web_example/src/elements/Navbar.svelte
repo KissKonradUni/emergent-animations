@@ -38,24 +38,11 @@
         gap: 1rem;
     }
 
-    :global(.navbar-link) {
-        color: var(--accent-color);
-        font-weight: bold;
-    }
-
-    :global(.navbar-link:hover) {
-        color: var(--light-accent-color);
-    }
-
-    :global(.navbar-link:active) {
-        color: var(--text-color);
-    }
-
     :global(.navbar-title) {
         font-size: 2rem;
         font-weight: bold;
     
-        color: var(--text-color);
+        color: var(--text-color) !important;
         text-decoration: none;
 
         white-space: nowrap;

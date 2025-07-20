@@ -4,6 +4,8 @@
     
     import Tabs from "../../elements/Tabs.svelte";
     import Tab from "../../elements/Tab.svelte";
+
+    import { CatPendulum } from "../../rendering/scenes/CatPendulum";
 </script>
 
 <Page title="Frame Animations">
@@ -12,7 +14,7 @@
             <Canvas></Canvas>
         </Tab>
         <Tab title="Complex">
-            <Canvas></Canvas>
+            <Canvas scene={CatPendulum.provide()}></Canvas>
         </Tab>
     </Tabs>
 </Page>

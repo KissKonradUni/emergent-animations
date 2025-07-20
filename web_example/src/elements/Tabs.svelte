@@ -55,10 +55,14 @@
     .tab-buttons button.active {
         padding-top: calc(0.25rem + 4px);
 
-        background-color: var(--secondary-color);
+        background: var(--tertiary-color);
         color: var(--accent-color);
 
         border-bottom: 4px solid var(--accent-color);
+    }
+
+    .tab-buttons button:hover {
+        background: var(--tertiary-color);   
     }
 
     .tab-contents {

@@ -12,6 +12,10 @@ export class CanvasImageTexture {
         if (!CanvasImageTexture.cache.has(url)) {
             this.image.src = url;
             CanvasImageTexture.cache.set(url, this.image);
+        } else {
+            this.loaded = true;
+            const cachedImage = CanvasImageTexture.cache.get(url)!;
+            this.size.set(cachedImage.width, cachedImage.height);
         }
 
         this.image.onload = () => {

@@ -1,6 +1,10 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { CanvasWrapper } from "../rendering/CanvasWrapper";
+    import type { CanvasScene, SceneProvider } from "../rendering/CanvasScene.ts";
+
+    let props = $props();
+    let sceneProvider: SceneProvider = props.scene || (() => null);
 
     let canvasElement   : HTMLCanvasElement;
     let wrapperElement  : HTMLElement;
@@ -12,7 +16,8 @@
     onMount(() => {
         wrapper = new CanvasWrapper(
             canvasElement,
-            wrapperElement
+            wrapperElement,
+            sceneProvider
         );
 
         fullscreenButton.addEventListener("click", () => {
@@ -40,7 +45,7 @@
 
 <div class="canvas-wrapper" bind:this={wrapperElement}>
     <button class="fullscreen" bind:this={fullscreenButton}>
-        <span>Fullscreen</span>
+        <span>⛶</span>
     </button>
     <canvas width="200" height="100" class="canvas {isFullscreen? "fullscreen" : ""}" bind:this={canvasElement}></canvas>
 </div>

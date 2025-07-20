@@ -1,10 +1,10 @@
 <script lang="ts">
-    interface ExtraTitle {
+    interface IExtraTitle {
         href: string;
         title: string;
     }
 
-    let { title = "Some Page", children, style = "", extra = null as ExtraTitle } = $props();
+    let { title = "Some Page", children, style = "", extra = null as IExtraTitle } = $props();
 </script>
 
 <section class="page" {style} id="current-page">

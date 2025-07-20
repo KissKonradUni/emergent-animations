@@ -1,6 +1,8 @@
 <script lang="ts">
 	import Navbar from "./elements/Navbar.svelte";
 	import Router from "./elements/Router.svelte";
+
+    import Link from "./elements/Link.svelte";
 </script>
 
 <Navbar />
@@ -10,10 +12,11 @@
 <footer>
 	<span>
         Created by 
-        <a href="https://github.com/KissKonradUni/emergent-animations" target="_blank" rel="noopener noreferrer">Konrád Soma Kiss</a>
+        <Link href="https://github.com/KissKonradUni/emergent-animations" target="_blank" rel="noopener noreferrer">Konrád Soma Kiss</Link>
         using 
-        <a href="https://svelte.dev" target="_blank" rel="noopener noreferrer">Svelte</a>
-        ❤️</span>
+        <Link href="https://svelte.dev" target="_blank" rel="noopener noreferrer">Svelte</Link>
+        ❤️
+    </span>
 </footer>
 
 <style>
@@ -46,13 +49,4 @@
 
         box-shadow: 0 0px 4px 4px rgba(0, 0, 0, 0.5);
 	}
-
-    footer a {
-        color: var(--accent-color);
-        font-weight: bold;
-    }
-
-    footer a:hover {
-        color: var(--light-accent-color);
-    }
 </style>
