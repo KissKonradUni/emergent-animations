@@ -2,6 +2,7 @@
     import { onMount } from "svelte";
     import { CanvasWrapper } from "../rendering/CanvasWrapper";
     import type { CanvasScene, SceneProvider } from "../rendering/CanvasScene.ts";
+	import { CanvasObject } from "../rendering/CanvasObject";
 
     let props = $props();
     let sceneProvider: SceneProvider = props.scene || (() => null);
@@ -47,6 +48,9 @@
     <button class="fullscreen" bind:this={fullscreenButton}>
         <span>⛶</span>
     </button>
+    <button class="debugMode" onclick={() => CanvasObject.setDebugMode(!CanvasObject.debugMode)}>
+        <span>🛠️</span>
+    </button>
     <canvas width="200" height="100" class="canvas {isFullscreen? "fullscreen" : ""}" bind:this={canvasElement}></canvas>
 </div>
 
@@ -80,9 +84,50 @@
         flex: 1;
     }
 
-    button.fullscreen {
+    button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
         position: absolute;
+        z-index: 10;
+
+        width: 2rem;
+        height: 2rem;
+
+        background-color: var(--primary-color);
+        color: var(--text-color);
+        border: none;
+        border-radius: 0.25rem;
+
+        font-size: 1rem;
+
+        cursor: pointer;
+
+        transition: background-color 0.15s ease, scale 0.1s ease;
+    }
+
+    button:hover {
+        background-color: var(--tertiary-color);
+        scale: 1.05;
+    }
+
+    button:active {
+        background-color: var(--secondary-color);
+        scale: 0.95;
+    }
+
+    button:focus {
+        outline: 2px solid var(--accent-color);
+    }
+
+    button.fullscreen {
         top: 0.5rem;
+        right: 0.5rem;
+    }
+
+    button.debugMode {
+        top: 3rem;
         right: 0.5rem;
     }
 </style>

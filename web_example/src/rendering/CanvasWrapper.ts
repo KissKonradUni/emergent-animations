@@ -8,21 +8,38 @@ export class Time {
 }
 
 class ExampleCanvasScene extends CanvasScene {
+    objects: {
+        text: CanvasObject;
+    }
+    halfResolution: Vector2f;
+    
     constructor(wrapper: CanvasWrapper, context: CanvasRenderingContext2D, time: Readonly<Time>) {
         super(wrapper, context, time);
+
+        const resolution = wrapper.resolution;
+        this.halfResolution = resolution.multiply(0.5);
+
+        this.objects = {
+            text: new CanvasObject(
+                CanvasObject.staticText(
+                    "Please provide a scene implementation.",
+                    "32px Consolas, monospace",
+                    "white",
+                    "center",
+                    "middle"
+                ),
+                this.halfResolution,
+                resolution,
+                new Vector2f(1.0, 1.0),
+                new Vector2f(0.5, 0.5),
+                0
+            )
+        };
     }
 
     override render(): void {
-        this.context.fillStyle = 'white';
-        this.context.textAlign = 'center';
-        this.context.textBaseline = 'middle';
-        this.context.font = '32px Consolas, monospace';
-        
-        const message = "Please provide a scene implementation.";
-        const resolution = this.wrapper.resolution;
-        const position = resolution.multiply(0.5);
-        
-        this.context.fillText(message, position.x, position.y + Math.sin(this.time.now * 5) * 20);
+        this.objects.text.rotation = Math.sin(this.time.now * 5) * Math.PI * 0.025;
+        this.objects.text.render(this.context);
     }
 }
 
@@ -58,7 +75,7 @@ export class CanvasWrapper {
         if (this._scene === null)
             this._scene = new ExampleCanvasScene(this, this._context, this._time);
 
-        CanvasObject.setDebugMode(true);
+        //CanvasObject.setDebugMode(true);
 
         if (!this._context) {
             throw new Error('Failed to get 2D context from canvas');

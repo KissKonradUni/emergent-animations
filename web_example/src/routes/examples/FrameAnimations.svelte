@@ -6,12 +6,13 @@
     import Tab from "../../elements/Tab.svelte";
 
     import { CatPendulum } from "../../rendering/scenes/CatPendulum";
+    import { SimpleFrameAnimation } from "../../rendering/scenes/SimpleFrameAnimation";
 </script>
 
 <Page title="Frame Animations">
     <Tabs>
         <Tab title="Simple">
-            <Canvas></Canvas>
+            <Canvas scene={SimpleFrameAnimation.provide()}></Canvas>
         </Tab>
         <Tab title="Complex">
             <Canvas scene={CatPendulum.provide()}></Canvas>

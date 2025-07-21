@@ -160,6 +160,29 @@ export class CanvasObject {
         };
     }
 
+    public static roundedRectangle(
+        fillStyle: string,
+        strokeStyle: string | null = null,
+        radius: number = 10,
+    ): RenderFunction {
+        return (object: CanvasObject, context: CanvasRenderingContext2D) => {
+            context.beginPath();
+            context.roundRect(
+                -object.size.x * object.pivot.x,
+                -object.size.y * object.pivot.y,
+                object.size.x,
+                object.size.y,
+                radius,
+            );
+            context.fillStyle = fillStyle;
+            context.fill();
+            if (strokeStyle) {
+                context.strokeStyle = strokeStyle;
+                context.stroke();
+            }
+        };
+    }
+
     public static line(
         strokeStyle: string,
         lineWidth: number = 1,
@@ -212,6 +235,45 @@ export class CanvasObject {
                 object.size.x,
                 object.size.y
             )
+        };
+    }
+
+    public static staticText(
+        text: string,
+        font: string = '16px monospace, Consolas',
+        fillStyle: string = '#000',
+        alignment: CanvasTextAlign = 'left',
+        baseline: CanvasTextBaseline = 'top',
+    ): RenderFunction {
+        return (_object: CanvasObject, context: CanvasRenderingContext2D) => {
+            context.font = font;
+            context.fillStyle = fillStyle;
+            context.textAlign = alignment;
+            context.textBaseline = baseline;
+            context.fillText(
+                text,
+                0, 0
+            );
+        };
+    }
+
+    public static dynamicText(
+        text: () => string,
+        font: string = '16px monospace, Consolas',
+        fillStyle: string = '#000',
+        alignment: CanvasTextAlign = 'left',
+        baseline: CanvasTextBaseline = 'top',
+    ): RenderFunction {
+        return (object: CanvasObject, context: CanvasRenderingContext2D) => {
+            context.font = font;
+            context.fillStyle = fillStyle;
+            context.textAlign = alignment;
+            context.textBaseline = baseline;
+            context.fillText(
+                text(),
+                -object.size.x * object.pivot.x,
+                -object.size.y * object.pivot.y
+            );
         };
     }
 
