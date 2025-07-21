@@ -1,0 +1,12 @@
+.example-menu-item {
+    display: block;
+
+    padding: 0.5rem 1rem;
+    
+    background-color: var(--secondary-color);
+    border-radius: 4px;
+}
+
+.example-menu-item:hover {
+    background-color: var(--tertiary-color);
+}

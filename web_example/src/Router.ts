@@ -6,6 +6,7 @@ import AboutRoute from './routes/About.svelte';
 
 import ExamplesRoute from './routes/examples/Examples.svelte';
 import FrameAnimations from './routes/examples/FrameAnimations.svelte';
+import CellularAutomatas from './routes/examples/CellularAutomatas.svelte';
 
 const Callbacks: Array<(route: IRoute | null) => void> = [];
 
@@ -24,6 +25,7 @@ const RouteArray = [
 
     { href: '/examples', component: ExamplesRoute, title: 'Examples'},
     { href: '/examples/frame-animations', component: FrameAnimations, title: 'Frame Animations' },
+    { href: '/examples/cellular-automatas', component: CellularAutomatas, title: 'Cellular Automatas' },
 ];
 
 export const Routes: Record<string, IRoute> = RouteArray.reduce((collection: Record<string, IRoute>, route) => {

@@ -119,9 +119,9 @@ export class CatPendulum extends CanvasScene {
         
         this.objects.cat3.render(this.context);
 
-        this.objects.progressBars.cat1.setProgress(((this.time.now * 24) / 158) % 1);
-        this.objects.progressBars.cat2.setProgress(((this.time.now * 24) / 71) % 1);
-        this.objects.progressBars.cat3.setProgress(((this.time.now * 24) / 68) % 1);
+        this.objects.progressBars.cat1.setProgress((Math.round(this.time.now * 24) / 158) % 1);
+        this.objects.progressBars.cat2.setProgress((Math.round(this.time.now * 24) / 71) % 1);
+        this.objects.progressBars.cat3.setProgress((Math.round(this.time.now * 24) / 68) % 1);
 
         this.objects.progressBars.cat1.render(this.context);
         this.objects.progressBars.cat2.render(this.context);

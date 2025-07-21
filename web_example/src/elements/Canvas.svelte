@@ -56,11 +56,17 @@
 
 <style>
     canvas {
+        position: relative;
+        top: 0;
+        left: 0;
+
         display: block;
 
         width: 100%;
         /* Hack: I calculated this. Don't ask me how. */
         height: calc(100vh - 16.5rem);
+
+        z-index: 1;
 
         background-color: var(--secondary-color);
     }

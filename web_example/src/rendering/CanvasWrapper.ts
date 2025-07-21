@@ -56,11 +56,22 @@ export class CanvasWrapper {
     
     private _resolution: Vector2f = new Vector2f(1280, 720);
     public get resolution(): Readonly<Vector2f> { return this._resolution; }
+    public get clientSize(): Vector2f {
+        return new Vector2f(
+            this._wrapperElement.clientWidth  * this._dpi * this._resolutionScale,
+            this._wrapperElement.clientHeight * this._dpi * this._resolutionScale
+        );
+    }
     private _resolutionScale: number = 1.0;
 
     private _dpi: number = globalThis.devicePixelRatio || 2;
 
     private _scene: CanvasScene | null = null;
+
+    private _glHandler: {
+        _glCanvas: HTMLCanvasElement;
+        _glContext: WebGL2RenderingContext | null;
+    } | null = null;
 
     constructor(canvas: HTMLCanvasElement, wrapperElement: HTMLElement, sceneProvider: SceneProvider) {
         this._instanceId = CanvasWrapper.IdCounter++;
@@ -139,7 +150,7 @@ export class CanvasWrapper {
         this._context.setTransform(scale, 0, 0, scale, offsetX, offsetY);
 
         // Fill the background
-        this._context.fillStyle = '#444';
+        this._context.fillStyle = "#444";
         this._context.fillRect(0, 0, this._resolution.x, this._resolution.y);
 
         // Draw a border around the virtual resolution
@@ -179,5 +190,39 @@ export class CanvasWrapper {
             (measurments.actualBoundingBoxLeft   + measurments.actualBoundingBoxRight  ),
             (measurments.actualBoundingBoxAscent + measurments.actualBoundingBoxDescent)
         );
+    }
+
+    public getWebGLContext(): WebGL2RenderingContext | null {
+        if (this._glHandler) {
+            return this._glHandler._glContext;
+        }
+
+        const glCanvas = document.createElement('canvas');
+        glCanvas.classList.add('webgl-canvas');
+
+        this._glHandler = {
+            _glCanvas: glCanvas,
+            _glContext: glCanvas.getContext('webgl2')
+        };
+
+        if (!this._glHandler._glContext) {
+            console.error("WebGL context is not available.");
+            return null;
+        }
+
+        // Set the canvas size to match the wrapper element and
+        // add resize listener to update the WebGL canvas size
+        const onResizeListener = () => {
+            this._glHandler!._glCanvas.width  = this._wrapperElement.clientWidth  * this._dpi * this._resolutionScale;
+            this._glHandler!._glCanvas.height = this._wrapperElement.clientHeight * this._dpi * this._resolutionScale;
+            this._glHandler!._glContext!.viewport(0, 0, this._glHandler!._glCanvas.width, this._glHandler!._glCanvas.height);
+        }
+        globalThis.addEventListener('resize', onResizeListener.bind(this));
+        onResizeListener();
+
+        // Append the WebGL canvas to the wrapper element before the main canvas
+        this._wrapperElement.insertBefore(this._glHandler._glCanvas, this._canvas);
+
+        return this._glHandler._glContext;
     }
 }

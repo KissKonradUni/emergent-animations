@@ -1,26 +1,24 @@
 <script lang="ts">
     import Page from "../../elements/Page.svelte";
-	
 	import Link from "../../elements/Link.svelte";
+    import "./examples.css";
 </script>
 
 <Page title="Examples">
-    <Link href="/examples/frame-animations" cssClass="example-menu-item">
-        Frame Animations
-    </Link>
+    <div class="list">
+        <Link href="/examples/frame-animations" cssClass="example-menu-item">
+            Frame Animations
+        </Link>
+        <Link href="/examples/cellular-automatas" cssClass="example-menu-item">
+            Cellular Automatas
+        </Link>
+    </div>
 </Page>
 
 <style>
-    :global(.example-menu-item) {
-        display: block;
-
-        padding: 0.5rem 1rem;
-        
-        background-color: var(--secondary-color);
-        border-radius: 4px;
-    }
-
-    :global(.example-menu-item:hover) {
-        background-color: var(--tertiary-color);
+    div.list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
     }
 </style>

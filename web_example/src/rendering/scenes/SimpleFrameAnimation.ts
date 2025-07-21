@@ -84,7 +84,7 @@ export class SimpleFrameAnimation extends CanvasScene {
         // - The current frame is determined by the time elapsed, multiplied by 24 to achieve 24 frames per second.
         // - The progress bar foreground is scaled based on the current frame divided by the total frames.
         // - The modulo operation ensures that the progress bar loops correctly.
-        this.objects.progressBar.setProgress(((this.time.now * 24) / 158) % 1);
+        this.objects.progressBar.setProgress((Math.round(this.time.now * 24) / 158) % 1);
 
         // Only the background needs to be rendered, as the foreground and text are children of the background object.
         this.objects.progressBar.render(this.context);
