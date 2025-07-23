@@ -29,11 +29,8 @@ export class ProgressBar {
             new Vector2f(0.0, 0.0)
         );
         this.text = new CanvasObject(
-            CanvasObject.dynamicText(textProvider, "24px Consolas, monospace", "white", "left", "top"),
-            new Vector2f(0, -24),
-            size,
-            new Vector2f(1.0, 1.0),
-            new Vector2f(0.0, 0.0)
+            CanvasObject.dynamicText(textProvider, "24px Consolas, monospace", "white", "left", "middle"),
+            new Vector2f(0, -12),
         );
 
         this.background.children.push(this.foreground, this.text);

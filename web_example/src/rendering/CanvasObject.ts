@@ -11,13 +11,25 @@ export class CanvasObject {
 
     public position: Vector2f;
     public rotation: number;
-    public size: Vector2f;
+    private _size: Vector2f;
+    public get size(): Vector2f {
+        return this._size;
+    }
+    public set size(value: Vector2f) {
+        this._size = value;
+        this._hasDefaultSize = false;
+    }
     public scale: Vector2f;
     public pivot: Vector2f;
     
     protected renderFunction: RenderFunction;
 
     public children: CanvasObject[];
+
+    private _hasDefaultSize: boolean = true;
+    public get hasDefaultSize(): Readonly<boolean> {
+        return this._hasDefaultSize;
+    }
     
     /**
      * Represents a drawable object on a canvas.
@@ -40,7 +52,8 @@ export class CanvasObject {
     ) {
         this.position = position;
         this.rotation = rotation;
-        this.size = size;
+        this._size = size;
+        this._hasDefaultSize = size.x === 100 && size.y === 100;
         this.scale = scale;
         this.pivot = pivot;
         
@@ -245,16 +258,13 @@ export class CanvasObject {
         alignment: CanvasTextAlign = 'left',
         baseline: CanvasTextBaseline = 'top',
     ): RenderFunction {
-        return (_object: CanvasObject, context: CanvasRenderingContext2D) => {
-            context.font = font;
-            context.fillStyle = fillStyle;
-            context.textAlign = alignment;
-            context.textBaseline = baseline;
-            context.fillText(
-                text,
-                0, 0
-            );
-        };
+        return CanvasObject.dynamicText(
+            () => text,
+            font,
+            fillStyle,
+            alignment,
+            baseline,
+        );
     }
 
     public static dynamicText(
@@ -265,15 +275,193 @@ export class CanvasObject {
         baseline: CanvasTextBaseline = 'top',
     ): RenderFunction {
         return (object: CanvasObject, context: CanvasRenderingContext2D) => {
+            const _text = text();
             context.font = font;
             context.fillStyle = fillStyle;
             context.textAlign = alignment;
             context.textBaseline = baseline;
+
+            if (object.hasDefaultSize) {
+                object.size.x = 1;
+                object.size.y = 1;
+            }
+
             context.fillText(
-                text(),
-                -object.size.x * object.pivot.x,
-                -object.size.y * object.pivot.y
+                _text,
+                0, 0
             );
+        };
+    }
+
+    public static plotFunction(
+        title: string,
+        func: (x: number) => number,
+        xRange: {lower: number, upper: number} = {lower: -5, upper: 5},
+        yRange: {lower: number, upper: number} = {lower: -5, upper: 5},
+        step: number = 0.1
+    ) {
+        return (object: CanvasObject, context: CanvasRenderingContext2D) => {
+            const positionOffset = new Vector2f(
+                ((object.pivot.x - 0.5) * object.size.x),
+                ((object.pivot.y - 0.5) * object.size.y)
+            );
+            const topLeft = new Vector2f(
+                -object.size.x / 2 - positionOffset.x,
+                -object.size.y / 2 - positionOffset.y
+            );
+
+            // Title
+            context.font = '20px monospace, Consolas';
+            context.fillStyle = '#fff';
+            context.textAlign = 'center';
+            context.textBaseline = 'bottom';
+            context.fillText(
+                title,
+                topLeft.x + object.size.x / 2,
+                topLeft.y
+            );
+            
+            // Y-axis
+            const widthPercentage = (1 - (xRange.upper) / (xRange.upper - xRange.lower)); // Invert for canvas coordinates
+            if (widthPercentage >= 0 && widthPercentage <= 1) {
+                context.beginPath();
+                context.moveTo(
+                    topLeft.x + object.size.x * widthPercentage,
+                    topLeft.y
+                );
+                context.lineTo(
+                    topLeft.x + object.size.x * widthPercentage,
+                    topLeft.y + object.size.y
+                );
+
+                context.strokeStyle = '#000';
+                context.lineWidth = 2;
+                context.stroke();
+
+                // Top of the Y-axis
+                context.fillStyle = '#000';
+                context.textAlign = 'left';
+                context.textBaseline = 'top';
+                context.fillText(
+                    yRange.upper.toString(),
+                    topLeft.x + object.size.x * widthPercentage + 5,
+                    topLeft.y
+                );
+
+                // Bottom of the Y-axis
+                context.textAlign = 'left';
+                context.textBaseline = 'bottom';
+                context.fillText(
+                    yRange.lower.toString(),
+                    topLeft.x + object.size.x * widthPercentage + 5,
+                    topLeft.y + object.size.y
+                );
+
+                // Lines for 1s
+                for (let i = Math.ceil(yRange.lower); i <= Math.floor(yRange.upper); i++) {
+                    if (i === 0) continue;
+
+                    const yPos = topLeft.y + object.size.y * (1 - (i - yRange.lower) / (yRange.upper - yRange.lower));
+                    context.beginPath();
+                    context.moveTo(
+                        topLeft.x,
+                        yPos
+                    );
+                    context.lineTo(
+                        topLeft.x + object.size.x,
+                        yPos
+                    );
+                    context.strokeStyle = '#00000044';
+                    context.lineWidth = 2;
+                    context.stroke();
+                }
+            }
+
+            // X-axis
+            const heightPercentage = ((yRange.upper) / (yRange.upper - yRange.lower));
+            if (heightPercentage >= 0 && heightPercentage <= 1) {
+                context.beginPath();
+                context.moveTo(
+                    topLeft.x,
+                    topLeft.y + object.size.y * heightPercentage
+                );
+                context.lineTo(
+                    topLeft.x + object.size.x,
+                    topLeft.y + object.size.y * heightPercentage
+                );
+
+                context.strokeStyle = '#000';
+                context.lineWidth = 2;
+                context.stroke();
+
+                // Left of the X-axis
+                context.fillStyle = '#000';
+                context.textAlign = 'left';
+                context.textBaseline = 'top';
+                context.fillText(
+                    xRange.lower.toString(),
+                    topLeft.x,
+                    topLeft.y + object.size.y * heightPercentage + 5
+                );
+
+                // Right of the X-axis
+                context.textAlign = 'right';
+                context.textBaseline = 'top';
+                context.fillText(
+                    xRange.upper.toString(),
+                    topLeft.x + object.size.x,
+                    topLeft.y + object.size.y * heightPercentage + 5
+                );
+
+                // Lines for 1s
+                for (let i = Math.ceil(xRange.lower); i <= Math.floor(xRange.upper); i++) {
+                    if (i === 0) continue;
+
+                    const xPos = topLeft.x + object.size.x * ((i - xRange.lower) / (xRange.upper - xRange.lower));
+                    context.beginPath();
+                    context.moveTo(
+                        xPos,
+                        topLeft.y
+                    );
+                    context.lineTo(
+                        xPos,
+                        topLeft.y + object.size.y
+                    );
+                    context.strokeStyle = '#00000044';
+                    context.lineWidth = 2;
+                    context.stroke();
+                }
+            }
+
+            // Plot the function
+            context.beginPath();
+
+            const xScale = object.size.x / (xRange.upper - xRange.lower);
+            const yScale = object.size.y / (yRange.upper - yRange.lower);
+            
+            for (let x = xRange.lower; x <= xRange.upper; x += step) {
+                const y = func(x);
+                context.lineTo(
+                    topLeft.x + (x - xRange.lower) * xScale,
+                    topLeft.y + object.size.y - (y - yRange.lower) * yScale
+                );
+            }
+
+            context.strokeStyle = '#ff5722';
+            context.lineWidth = 4;
+            context.stroke();
+
+            const funcAtZero = func(0);
+            if (funcAtZero >= yRange.lower && funcAtZero <= yRange.upper && widthPercentage >= 0 && widthPercentage <= 1) {
+                context.beginPath();
+                context.ellipse(
+                    topLeft.x + object.size.x * widthPercentage,
+                    topLeft.y + object.size.y * heightPercentage - funcAtZero * yScale,
+                    5, 5, 0, 0, Math.PI * 2
+                );
+                context.fillStyle = '#f00';
+                context.fill();
+            }
         };
     }
 

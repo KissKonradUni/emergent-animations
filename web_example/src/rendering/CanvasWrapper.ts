@@ -29,10 +29,7 @@ class ExampleCanvasScene extends CanvasScene {
                     "middle"
                 ),
                 this.halfResolution,
-                resolution,
-                new Vector2f(1.0, 1.0),
-                new Vector2f(0.5, 0.5),
-                0
+                resolution
             )
         };
     }
@@ -58,12 +55,11 @@ export class CanvasWrapper {
     public get resolution(): Readonly<Vector2f> { return this._resolution; }
     public get clientSize(): Vector2f {
         return new Vector2f(
-            this._wrapperElement.clientWidth  * this._dpi * this._resolutionScale,
-            this._wrapperElement.clientHeight * this._dpi * this._resolutionScale
+            this._wrapperElement.clientWidth ,
+            this._wrapperElement.clientHeight
         );
     }
     private _resolutionScale: number = 1.0;
-
     private _dpi: number = globalThis.devicePixelRatio || 2;
 
     private _scene: CanvasScene | null = null;
@@ -71,6 +67,7 @@ export class CanvasWrapper {
     private _glHandler: {
         _glCanvas: HTMLCanvasElement;
         _glContext: WebGL2RenderingContext | null;
+        _glResolution: Vector2f;
     } | null = null;
 
     constructor(canvas: HTMLCanvasElement, wrapperElement: HTMLElement, sceneProvider: SceneProvider) {
@@ -143,7 +140,7 @@ export class CanvasWrapper {
         const scale = Math.min(scaleX, scaleY);
         
         // Center the virtual resolution in the canvas
-        const offsetX = (this._canvas.width - this._resolution.x * scale) / 2;
+        const offsetX = (this._canvas.width  - this._resolution.x * scale) / 2;
         const offsetY = (this._canvas.height - this._resolution.y * scale) / 2;
         
         // Apply the transformation
@@ -202,7 +199,8 @@ export class CanvasWrapper {
 
         this._glHandler = {
             _glCanvas: glCanvas,
-            _glContext: glCanvas.getContext('webgl2')
+            _glContext: glCanvas.getContext('webgl2'),
+            _glResolution: new Vector2f(1280, 720)
         };
 
         if (!this._glHandler._glContext) {
@@ -213,12 +211,27 @@ export class CanvasWrapper {
         // Set the canvas size to match the wrapper element and
         // add resize listener to update the WebGL canvas size
         const onResizeListener = () => {
-            this._glHandler!._glCanvas.width  = this._wrapperElement.clientWidth  * this._dpi * this._resolutionScale;
-            this._glHandler!._glCanvas.height = this._wrapperElement.clientHeight * this._dpi * this._resolutionScale;
-            this._glHandler!._glContext!.viewport(0, 0, this._glHandler!._glCanvas.width, this._glHandler!._glCanvas.height);
+            this._glHandler!._glCanvas.width  = this._wrapperElement.clientWidth ;
+            this._glHandler!._glCanvas.height = this._wrapperElement.clientHeight;
+            
+            const scaleX = this._wrapperElement.clientWidth  / this._resolution.x;
+            const scaleY = this._wrapperElement.clientHeight / this._resolution.y;
+            const scale = Math.min(scaleX, scaleY);
+            
+            const offsetX = (this._wrapperElement.clientWidth  - this._resolution.x * scale) / 2;
+            const offsetY = (this._wrapperElement.clientHeight - this._resolution.y * scale) / 2;
+
+            this._glHandler!._glResolution.x = this._resolution.x * scale;
+            this._glHandler!._glResolution.y = this._resolution.y * scale; 
+
+            this._glHandler!._glContext!.viewport(
+                offsetX, offsetY,
+                this._resolution.x * scale,
+                this._resolution.y * scale
+            )
         }
         globalThis.addEventListener('resize', onResizeListener.bind(this));
-        onResizeListener();
+        setTimeout(onResizeListener.bind(this), 1); // Let a frame pass to ensure the wrapper element is ready
 
         // Append the WebGL canvas to the wrapper element before the main canvas
         this._wrapperElement.insertBefore(this._glHandler._glCanvas, this._canvas);

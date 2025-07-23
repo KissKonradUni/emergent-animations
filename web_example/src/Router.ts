@@ -5,6 +5,7 @@ import ThesisRoute from './routes/Thesis.svelte';
 import AboutRoute from './routes/About.svelte';
 
 import ExamplesRoute from './routes/examples/Examples.svelte';
+import FunctionalAnimations from './routes/examples/FunctionalAnimations.svelte';
 import FrameAnimations from './routes/examples/FrameAnimations.svelte';
 import CellularAutomatas from './routes/examples/CellularAutomatas.svelte';
 
@@ -24,6 +25,7 @@ const RouteArray = [
     { href: '/about'   , component: AboutRoute,    title: 'About'   },
 
     { href: '/examples', component: ExamplesRoute, title: 'Examples'},
+    { href: '/examples/functional-animations', component: FunctionalAnimations, title: 'Functional Animations' },
     { href: '/examples/frame-animations', component: FrameAnimations, title: 'Frame Animations' },
     { href: '/examples/cellular-automatas', component: CellularAutomatas, title: 'Cellular Automatas' },
 ];

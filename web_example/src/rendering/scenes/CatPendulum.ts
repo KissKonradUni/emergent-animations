@@ -65,7 +65,7 @@ export class CatPendulum extends CanvasScene {
                         "24px Consolas, monospace",
                         "white",
                         "center",
-                        "bottom"
+                        "middle"
                     )
                 ),
                 cat2: new CanvasObject(
@@ -74,7 +74,7 @@ export class CatPendulum extends CanvasScene {
                         "24px Consolas, monospace",
                         "white",
                         "center",
-                        "bottom"
+                        "middle"
                     )
                 ),
                 cat3: new CanvasObject(
@@ -83,7 +83,7 @@ export class CatPendulum extends CanvasScene {
                         "24px Consolas, monospace",
                         "white",
                         "center",
-                        "bottom"
+                        "middle"
                     )
                 )
             },

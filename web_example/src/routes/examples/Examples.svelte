@@ -6,6 +6,9 @@
 
 <Page title="Examples">
     <div class="list">
+        <Link href="/examples/functional-animations" cssClass="example-menu-item">
+            Functional Animations
+        </Link>
         <Link href="/examples/frame-animations" cssClass="example-menu-item">
             Frame Animations
         </Link>

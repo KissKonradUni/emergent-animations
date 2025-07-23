@@ -13,7 +13,6 @@ export class CanvasGLScene extends CanvasScene {
         }
 
         this.gl = glContext;
-        this.gl.viewport(0, 0, this.wrapper.clientSize.x, this.wrapper.clientSize.y);
 
         this.quad.vbo = this.gl.createBuffer();
         this.quad.ibo = this.gl.createBuffer();
@@ -80,19 +79,32 @@ export class CanvasGLScene extends CanvasScene {
         vertex: 
            `#version 300 es
             in vec3 a_position;
-            out vec3 v_color;
+            out vec2 v_uv;
             void main() {
                 gl_Position = vec4(a_position, 1.0);
-                v_color = a_position;
+                v_uv = (a_position.xy + vec2(1.0, 1.0)) * 0.5;
             }
         `,
         fragment: 
            `#version 300 es
             precision mediump float;
-            in vec3 v_color;
+            in vec2 v_uv;
             out vec4 outColor;
+            
             void main() {
-                outColor = vec4((v_color.xy + vec2(1, 1)) * 0.5, 0.0, 0.5);
+                vec2 uv = v_uv;
+                vec2 tileUV = uv * vec2(160.0, 90.0);
+
+                // Figure out the tile index based on the UV coordinates
+                int tileX = int(floor(tileUV.x));
+                int tileY = int(floor(tileUV.y));
+
+                // Checkerboard
+                if ((tileX + tileY) % 2 == 0) {
+                    outColor = vec4(1.0, 1.0, 1.0, 1.0); // White tile
+                } else {
+                    outColor = vec4(0.0, 0.0, 0.0, 1.0); // Black tile
+                }
             }
         `,
         program: null as WebGLProgram | null,
@@ -108,6 +120,7 @@ export class CanvasGLScene extends CanvasScene {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
         this.gl.useProgram(this.shaders.program!);
+
         this.gl.bindVertexArray(this.quad.vao);
         this.gl.drawElements(this.gl.TRIANGLE_STRIP, this.quad.indices.length, this.gl.UNSIGNED_SHORT, 0);
         this.gl.bindVertexArray(null);
