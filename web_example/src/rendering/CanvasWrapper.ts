@@ -1,11 +1,7 @@
 import { Vector2f } from "./CanvasMath.ts";
 import { CanvasObject } from "./CanvasObject.ts";
 import { CanvasScene, SceneProvider } from "./CanvasScene.ts";
-
-export class Time {
-    public delta: number = 0;
-    public now  : number = 0;
-}
+import { Time } from "./Time.ts";
 
 class ExampleCanvasScene extends CanvasScene {
     objects: {
@@ -63,6 +59,7 @@ export class CanvasWrapper {
     private _dpi: number = globalThis.devicePixelRatio || 2;
 
     private _scene: CanvasScene | null = null;
+    private _sequenceGenerator: Generator<void>;
 
     private _glHandler: {
         _glCanvas: HTMLCanvasElement;
@@ -83,7 +80,7 @@ export class CanvasWrapper {
         if (this._scene === null)
             this._scene = new ExampleCanvasScene(this, this._context, this._time);
 
-        //CanvasObject.setDebugMode(true);
+        this._sequenceGenerator = this._scene.sequence();
 
         if (!this._context) {
             throw new Error('Failed to get 2D context from canvas');
@@ -114,6 +111,7 @@ export class CanvasWrapper {
 
         // Render the scene
         this._scene!.render();
+        this._sequenceGenerator.next();
 
         // Draw debug information
         this.drawDebugInfo();
@@ -173,6 +171,8 @@ export class CanvasWrapper {
         this._context.moveTo(10, 30);
         this._context.lineTo(190, 30);
         this._context.strokeStyle = 'white';
+        this._context.lineWidth = 1;
+        this._context.lineCap = 'butt';
         this._context.stroke();
 
         // Draw information

@@ -2,7 +2,8 @@ import { CanvasSpritesheet } from "../CanvasImageTexture.ts";
 import { Vector2f } from "../CanvasMath.ts";
 import { CanvasObject } from "../CanvasObject.ts";
 import { CanvasScene } from "../CanvasScene.ts";
-import { CanvasWrapper, Time } from '../CanvasWrapper.ts';
+import { CanvasWrapper } from '../CanvasWrapper.ts';
+import { Time } from "../Time.ts";
 
 export class ProgressBar {
     private background: CanvasObject;

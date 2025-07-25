@@ -1,4 +1,5 @@
-import { CanvasWrapper, Time } from "./CanvasWrapper.ts";
+import { CanvasWrapper } from "./CanvasWrapper.ts";
+import { Time } from "./Time.ts";
 
 /**
  * Base class for a scene.
@@ -25,7 +26,12 @@ export class CanvasScene {
      * Renders the scene.
      * Everything necessary can be accessed through `this`.
      */
-    render(): void {};
+    public render(): void {};
+
+    /**
+     * An optional function that can be used to define a sequence of actions.
+     */
+    public* sequence(): Generator<void> {};
 
     /**
      * @returns The constructor of the scene.

@@ -298,7 +298,8 @@ export class CanvasObject {
         func: (x: number) => number,
         xRange: {lower: number, upper: number} = {lower: -5, upper: 5},
         yRange: {lower: number, upper: number} = {lower: -5, upper: 5},
-        step: number = 0.1
+        step: number = 0.1,
+        dotX: () => number = () => 0,
     ) {
         return (object: CanvasObject, context: CanvasRenderingContext2D) => {
             const positionOffset = new Vector2f(
@@ -308,17 +309,6 @@ export class CanvasObject {
             const topLeft = new Vector2f(
                 -object.size.x / 2 - positionOffset.x,
                 -object.size.y / 2 - positionOffset.y
-            );
-
-            // Title
-            context.font = '20px monospace, Consolas';
-            context.fillStyle = '#fff';
-            context.textAlign = 'center';
-            context.textBaseline = 'bottom';
-            context.fillText(
-                title,
-                topLeft.x + object.size.x / 2,
-                topLeft.y
             );
             
             // Y-axis
@@ -446,22 +436,43 @@ export class CanvasObject {
                     topLeft.y + object.size.y - (y - yRange.lower) * yScale
                 );
             }
+            const y = func(xRange.upper);
+            context.lineTo(
+                topLeft.x + (xRange.upper - xRange.lower) * xScale,
+                topLeft.y + object.size.y - (y - yRange.lower) * yScale
+            );
 
             context.strokeStyle = '#ff5722';
             context.lineWidth = 4;
             context.stroke();
 
-            const funcAtZero = func(0);
-            if (funcAtZero >= yRange.lower && funcAtZero <= yRange.upper && widthPercentage >= 0 && widthPercentage <= 1) {
+            // Draw a dot at the specified x position
+            const dotXPos = dotX();
+            const funcAtDot = func(dotXPos);
+            if (widthPercentage >= 0 && widthPercentage <= 1) {
                 context.beginPath();
                 context.ellipse(
-                    topLeft.x + object.size.x * widthPercentage,
-                    topLeft.y + object.size.y * heightPercentage - funcAtZero * yScale,
+                    topLeft.x + object.size.x * widthPercentage + dotXPos * xScale,
+                    topLeft.y + object.size.y * heightPercentage - funcAtDot * yScale,
                     5, 5, 0, 0, Math.PI * 2
                 );
                 context.fillStyle = '#f00';
+                context.strokeStyle = '#fff';
+                context.lineWidth = 2;
                 context.fill();
+                context.stroke();
             }
+
+            // Title
+            context.font = '20px monospace, Consolas';
+            context.fillStyle = '#fff';
+            context.textAlign = 'center';
+            context.textBaseline = 'bottom';
+            context.fillText(
+                title,
+                topLeft.x + object.size.x / 2,
+                topLeft.y
+            );
         };
     }
 

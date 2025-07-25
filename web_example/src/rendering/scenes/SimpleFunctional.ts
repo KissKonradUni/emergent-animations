@@ -1,7 +1,8 @@
 import { Vector2f } from "../CanvasMath.ts";
 import { CanvasObject } from "../CanvasObject.ts";
 import { CanvasScene } from "../CanvasScene.ts";
-import { CanvasWrapper, Time } from "../CanvasWrapper.ts";
+import { CanvasWrapper } from "../CanvasWrapper.ts";
+import { Time } from "../Time.ts";
 
 export class SimpleFunctional extends CanvasScene {
     objects: {
@@ -57,7 +58,7 @@ export class SimpleFunctional extends CanvasScene {
             ),
             circle: new CanvasObject(
                 CanvasObject.ellipse(
-                    "#3c434d",
+                    "#ff5722",
                     "#ff8a50",
                 ),
                 new Vector2f(350, 360),

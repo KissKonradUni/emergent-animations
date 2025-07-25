@@ -1,5 +1,6 @@
 import { CanvasScene } from "./CanvasScene.ts";
-import { CanvasWrapper, Time } from "./CanvasWrapper.ts";
+import { CanvasWrapper } from "./CanvasWrapper.ts";
+import { Time } from "./Time.ts";
 
 export class CanvasGLScene extends CanvasScene {
     protected gl: WebGL2RenderingContext;
