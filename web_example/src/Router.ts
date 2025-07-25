@@ -55,3 +55,9 @@ export function getCurrentRoute(): IRoute | null {
 export function onRouteChange(callback: (route: IRoute | null) => void) {
     Callbacks.push(callback);
 }
+
+globalThis.addEventListener('popstate', () => {
+    const path = globalThis.location.pathname.replace(BASE_URL, '');
+    CurrentRoute = Routes[path] ?? Routes['/404'];
+    Callbacks.forEach(callback => callback(CurrentRoute));
+});
