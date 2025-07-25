@@ -1,4 +1,5 @@
 import { Vector2f } from "./CanvasMath.ts";
+import { IS_LOCAL, BASE_URL } from "../Router.ts";
 
 export class CanvasImageTexture {
     protected static cache: Map<string, HTMLImageElement> = new Map();
@@ -7,14 +8,15 @@ export class CanvasImageTexture {
     protected size: Vector2f = new Vector2f(-1, -1);
 
     constructor(url: string) {
-        this.image = CanvasImageTexture.cache.get(url) || new Image();
+        const fullUrl = IS_LOCAL ? url : BASE_URL + url;
+        this.image = CanvasImageTexture.cache.get(fullUrl) || new Image();
         
-        if (!CanvasImageTexture.cache.has(url)) {
-            this.image.src = url;
-            CanvasImageTexture.cache.set(url, this.image);
+        if (!CanvasImageTexture.cache.has(fullUrl)) {
+            this.image.src = fullUrl;
+            CanvasImageTexture.cache.set(fullUrl, this.image);
         } else {
             this.loaded = true;
-            const cachedImage = CanvasImageTexture.cache.get(url)!;
+            const cachedImage = CanvasImageTexture.cache.get(fullUrl)!;
             this.size.set(cachedImage.width, cachedImage.height);
         }
 
@@ -71,5 +73,36 @@ export class CanvasSpritesheet extends CanvasImageTexture {
             frameHeight - CanvasSpritesheet.BIAS * 2,
             x, y, width, height
         );
+    }
+}
+
+/**
+ * Technically not similarly implemented to the original, but serves a similar purpose.
+ */
+export class CanvasManualTexture {
+    private canvas: HTMLCanvasElement;
+    private context: CanvasRenderingContext2D;
+
+    constructor(width: number, height: number) {
+        this.canvas = document.createElement("canvas");
+        this.canvas.width = width;
+        this.canvas.height = height;
+        this.context = this.canvas.getContext("2d")!;
+    }
+
+    public getCanvas(): HTMLCanvasElement {
+        return this.canvas;
+    }
+
+    public getContext(): CanvasRenderingContext2D {
+        return this.context;
+    }
+
+    public get imageData(): ImageData {
+        return this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
+    }
+
+    public set imageData(imageData: ImageData) {
+        this.context.putImageData(imageData, 0, 0);
     }
 }

@@ -177,12 +177,12 @@ export class SimpleInterpolation extends CanvasScene {
 
         this.context.lineWidth = 1;
 
-        Object.keys(this.objects).forEach((key) => {
-            this.objects[key as keyof typeof this.objects].render(this.context);
-        });
-
         this.dotPositions.ballA = this.sequencers.ballAInterpolator.progress;
         this.dotPositions.ballB = this.sequencers.ballBInterpolator.progress;
         this.dotPositions.ballC = this.sequencers.ballCInterpolator.progress;
+
+        Object.keys(this.objects).forEach((key) => {
+            this.objects[key as keyof typeof this.objects].render(this.context);
+        });
     }
 }

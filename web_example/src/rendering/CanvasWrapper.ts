@@ -154,6 +154,10 @@ export class CanvasWrapper {
     }
 
     private drawDebugInfo(): void {
+        if (CanvasObject.debugMode === false) {
+            return;
+        }
+
         // Draw a background rectangle
         this._context.fillStyle = "#00000044";
         this._context.fillRect(0, 0, 200, 100);

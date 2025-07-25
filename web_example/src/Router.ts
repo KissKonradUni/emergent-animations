@@ -9,6 +9,11 @@ import FunctionalAnimations from './routes/examples/FunctionalAnimations.svelte'
 import FrameAnimations from './routes/examples/FrameAnimations.svelte';
 import CellularAutomatas from './routes/examples/CellularAutomatas.svelte';
 
+declare const __IS_LOCAL__: boolean;
+console.log(`Running in ${__IS_LOCAL__ ? 'local' : 'production'} mode.`);
+export const IS_LOCAL = __IS_LOCAL__;
+export const BASE_URL = (typeof __IS_LOCAL__ !== 'undefined' && __IS_LOCAL__) ? '' : '/emergent-animations';
+
 const Callbacks: Array<(route: IRoute | null) => void> = [];
 
 export interface IRoute {
@@ -35,10 +40,10 @@ export const Routes: Record<string, IRoute> = RouteArray.reduce((collection: Rec
     return collection;
 }, {});
 
-let CurrentRoute: IRoute | null = Routes[globalThis.location.pathname] ?? Routes['/404'];
+let CurrentRoute: IRoute | null = Routes[globalThis.location.pathname.replace(BASE_URL, '')] ?? Routes['/404'];
 
 export function Navigate(path: string) {
-    globalThis.history.pushState({}, '', path);   
+    globalThis.history.pushState({}, '', BASE_URL + path);
     CurrentRoute = Routes[path] ?? Routes['/404'];
     Callbacks.forEach(callback => callback(CurrentRoute));
 }
