@@ -1,9 +1,12 @@
 <script lang="ts">
     import Page from '../elements/Page.svelte';    
+    import { IS_LOCAL, BASE_URL } from '../Router';
+
+    const pdfUrl = IS_LOCAL ? 'main.pdf' : `${BASE_URL}/main.pdf`;
 </script>
 
-<Page title="Thesis" extra={{href: "/main.pdf", title: "Open in a new page →"}}>
-    <iframe src="/main.pdf" frameborder="0" title="Thesis PDF"></iframe>
+<Page title="Thesis" extra={{href: pdfUrl, title: "Open in a new page →"}}>
+    <iframe src={pdfUrl} frameborder="0" title="Thesis PDF"></iframe>
 </Page>
 
 <style>

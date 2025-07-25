@@ -24,6 +24,9 @@ jobs:
         run: deno run build
         working-directory: ./web_example
 
+      - name: Copy index.html to 404.html (SPA routing)
+        run: cp ./web_example/dist/index.html ./web_example/dist/404.html
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
