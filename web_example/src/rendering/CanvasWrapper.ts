@@ -1,10 +1,10 @@
 import { Vector2f } from "./CanvasMath.ts";
-import { CanvasObject } from "./CanvasObject.ts";
+import { CanvasObject, Objects } from "./CanvasObject.ts";
 import { CanvasScene, SceneProvider } from "./CanvasScene.ts";
 import { Time } from "./Time.ts";
 
 class ExampleCanvasScene extends CanvasScene {
-    objects: {
+    override objects: {
         text: CanvasObject;
     }
     halfResolution: Vector2f;
@@ -17,7 +17,7 @@ class ExampleCanvasScene extends CanvasScene {
 
         this.objects = {
             text: new CanvasObject(
-                CanvasObject.staticText(
+                Objects.staticText(
                     "Please provide a scene implementation.",
                     "32px Consolas, monospace",
                     "white",
@@ -66,6 +66,29 @@ export class CanvasWrapper {
         _glContext: WebGL2RenderingContext | null;
         _glResolution: Vector2f;
     } | null = null;
+
+    private _fpsData = new Float32Array(201);
+    private _fpsAccumulative: number = 0;
+    private _fpsIndex: number = 0;
+    private _fpsBounds: { lower: number, upper: number } = { lower: 0, upper: 60 };
+    private _topFps: number = 60;
+    private _bottomFps: number = -1;
+
+    private _fpsPlot: CanvasObject = new CanvasObject(
+        Objects.plotFunction(
+            "",
+            (x) => this._fpsData[(x + this._fpsIndex) % 201],
+            { lower: 0, upper: 200  },
+            this._fpsBounds,
+            1,
+            () => 200,
+            20,
+        ),
+        new Vector2f(970, 10),
+        new Vector2f(300, 65),
+        new Vector2f(1, 1),
+        new Vector2f(0.0, 0.0),
+    );
 
     constructor(canvas: HTMLCanvasElement, wrapperElement: HTMLElement, sceneProvider: SceneProvider) {
         this._instanceId = CanvasWrapper.IdCounter++;
@@ -160,7 +183,7 @@ export class CanvasWrapper {
 
         // Draw a background rectangle
         this._context.fillStyle = "#00000044";
-        this._context.fillRect(0, 0, 200, 100);
+        this._context.fillRect(0, 0, 1280, 100);
 
         // Draw the debug text
         this._context.fillStyle = 'white';
@@ -173,16 +196,42 @@ export class CanvasWrapper {
         
         this._context.beginPath();
         this._context.moveTo(10, 30);
-        this._context.lineTo(190, 30);
+        this._context.lineTo(960, 30);
         this._context.strokeStyle = 'white';
         this._context.lineWidth = 1;
         this._context.lineCap = 'butt';
         this._context.stroke();
 
         // Draw information
-        this._context.fillText(`Delta : ${(this._time.delta * 1000).toFixed(2).padStart(5, "0")}ms`, 10, 50);
-        this._context.fillText(`Now   : ${this._time.now.toFixed(2)}s`, 10, 70);
-        this._context.fillText(`Canvas: ${this._canvas.width}x${this._canvas.height}`, 10, 90);
+        this._context.fillText(`Now       : ${this._time.now.toFixed(2)}s`, 10, 50);
+        this._context.fillText(`Resolution: ${this._canvas.width}x${this._canvas.height}`, 10, 70);
+        this._context.fillText(`Scene     : ${this._scene?.getFileInfo()}`, 10, 90);
+
+        const fps = 1 / this._time.delta;
+        // Draw FPS text
+        this._context.textAlign = 'right';
+        this._context.fillText(`FPS: ${fps.toFixed(2).padStart(6, '0')}`, 960, 20);
+        this._context.fillText(`Avg: ${(this._fpsAccumulative / 200).toFixed(2).padStart(6, '0')}`, 960, 50);
+        this._context.fillText(`Max: ${this._topFps.toFixed(2).padStart(6, '0')}`, 960, 70);
+        this._context.fillText(`Min: ${this._bottomFps.toFixed(2).padStart(6, '0')}`, 960, 90);
+
+
+        // Draw FPS plot
+        if (isNaN(fps) || isFinite(fps) === false) {
+            return;
+        }
+        this._topFps = Math.max(this._topFps, fps);
+        this._bottomFps = this._bottomFps < 0 ? fps : Math.min(this._bottomFps, fps);
+        this._fpsAccumulative += fps;
+        if (this._fpsIndex >= 201) {
+            this._fpsAccumulative -= this._fpsData[this._fpsIndex % 201];
+        }
+
+        CanvasObject.debugMode = false; // Disable debug mode for FPS plot
+        this._fpsData[this._fpsIndex++ % 201] = fps;
+        this._fpsBounds.upper = Math.max(this._fpsBounds.upper, Math.ceil(fps / 10 + 1) * 10);
+        this._fpsPlot.render(this._context);
+        CanvasObject.debugMode = true; // Re-enable debug mode
     }
 
     public getTextSize(text: string): Vector2f {

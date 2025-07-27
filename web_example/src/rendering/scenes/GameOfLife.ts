@@ -1,7 +1,7 @@
 import { CanvasManualTexture } from "../CanvasImageTexture.ts";
 import { CanvasScene } from "../CanvasScene.ts";
 import { CanvasWrapper } from "../CanvasWrapper.ts";
-import { Sequence, Timer } from "../Sequences.ts";
+import { Animator, Timer } from "../Sequences.ts";
 import { Time } from "../Time.ts";
 
 export class GameOfLife extends CanvasScene {
@@ -45,7 +45,7 @@ export class GameOfLife extends CanvasScene {
         while (true) {
             this.updateGrid();
             
-            yield* Sequence.run(this.timer);
+            yield* Animator.run(this.timer);
         }
     }
 

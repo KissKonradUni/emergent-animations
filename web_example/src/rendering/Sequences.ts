@@ -1,16 +1,31 @@
 import { Time } from "./Time.ts";
 
+/**
+ * Base class for sequence objects that can be run by the Animator.
+ */
 export abstract class SequenceObject {
     protected time: Readonly<Time>;
 
     constructor(time: Readonly<Time>) { 
         this.time = time;
     }
+
+    /**
+     * Starts the sequence. This method should be called before the first tick.
+     */
     public abstract start(): void;
+
+    /**
+     * Advances the sequence by one tick. Returns true if the sequence is finished.
+     * @returns {boolean} True if the sequence is finished, false otherwise.
+     */
     public abstract tick (): boolean;
 }
 
-export class Sequence {
+/**
+ * Animator class that manages the execution of sequence objects.
+ */
+export class Animator {
     public static* run(object: SequenceObject): Generator<void> {
         object.start();
         while (!object.tick()) {
@@ -29,6 +44,9 @@ export class Sequence {
     }
 }
 
+/**
+ * Timer class that represents a waiting period.
+ */
 export class Timer extends SequenceObject {
     private startTime: number = 0;
     private endTime: number = 0;
@@ -62,6 +80,11 @@ export class Timer extends SequenceObject {
     }
 }
 
+/**
+ * Function that defines the behavior of easing in animations.
+ * @param t - A normalized time value between 0 and 1.
+ * @return A value between 0 and 1 that represents the eased progress of the animation.
+ */
 export type EasingFunction = (t: number) => number;
 
 /**
@@ -78,6 +101,9 @@ interface InterpolatorOptions {
     easing?: EasingFunction;
 }
 
+/**
+ * Interpolator class that animates a value from a start value to an end value over a specified duration.
+ */
 export class Interpolator extends SequenceObject {
     private setter: (value: number) => void;
     
@@ -180,5 +206,55 @@ export class Easings {
             : t < 0.5
             ? -(Math.pow(2, 20 * t - 10) * Math.sin((20 * t - 11.125) * c5)) / 2
             : (Math.pow(2, -20 * t + 10) * Math.sin((20 * t - 11.125) * c5)) / 2 + 1;
+    }
+}
+
+interface SequenceOptions {
+    duration: number;
+    easing?: EasingFunction;
+}
+
+export class InterpolationSequence extends SequenceObject {
+    private values: Array<number>;
+    private currentIndex: number = 0;
+    private interpolator: Interpolator;
+
+    constructor(time: Readonly<Time>, setter: (value: number) => void, values: Array<number>, interpolatorOptions: SequenceOptions) {
+        super(time);
+        this.values = values;
+        this.interpolator = new Interpolator(time, setter, {
+            startValue: values[0],
+            endValue: values[1],
+            duration: interpolatorOptions.duration,
+            easing: interpolatorOptions.easing,
+        });
+    }
+
+    public override start(): void {
+        this.interpolator.start();
+        this.currentIndex = 0;
+        this.interpolator.options.startValue = this.values[0];
+        this.interpolator.options.endValue = this.values[1];
+    }
+
+    public override tick(): boolean {
+        // If the current index is out of bounds, the sequence is finished
+        if (this.currentIndex >= this.values.length) {
+            return true;
+        }
+
+        if (this.interpolator.tick()) {
+            this.currentIndex++;
+
+            // If there are more values to interpolate, set the next start and end values
+            if (this.currentIndex < this.values.length) {
+                this.interpolator.options.startValue = this.values[this.currentIndex];
+                this.interpolator.options.endValue = this.values[(this.currentIndex + 1) % this.values.length];
+                this.interpolator.start(); 
+            }
+        }
+
+        // Sequence not finished yet
+        return false; 
     }
 }

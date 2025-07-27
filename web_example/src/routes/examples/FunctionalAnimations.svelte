@@ -6,6 +6,7 @@
 
     import { SimpleFunctional } from '../../rendering/scenes/SimpleFunctional';
     import { SimpleInterpolation } from '../../rendering/scenes/SimpleInterpolation';
+    import { SimpleSequence } from '../../rendering/scenes/SimpleSequence';
 </script>
 
 <Page title="Functional Animations">
@@ -15,6 +16,9 @@
         </Tab>
         <Tab title="Simple interpolation">
             <Canvas scene={SimpleInterpolation.provide()}></Canvas>
+        </Tab>
+        <Tab title="Simple sequence">
+            <Canvas scene={SimpleSequence.provide()}></Canvas>
         </Tab>
     </Tabs>
 </Page>

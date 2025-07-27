@@ -6,7 +6,11 @@ export type RenderFunction = (
     context: CanvasRenderingContext2D,
 ) => void;
 
-export class CanvasObject {
+export interface Renderable {
+    render(context: CanvasRenderingContext2D, depth?: number): void;
+}
+
+export class CanvasObject implements Renderable {
     public static debugMode: boolean = false;
 
     public position: Vector2f;
@@ -24,7 +28,14 @@ export class CanvasObject {
     
     protected renderFunction: RenderFunction;
 
-    public children: CanvasObject[];
+    protected _parent: CanvasObject | null = null;
+    private _children: CanvasObject[];
+    public append(...children: CanvasObject[]): void {
+        this._children.push(...children);
+        children.forEach(child => {
+            child._parent = this;
+        });
+    }
 
     private _hasDefaultSize: boolean = true;
     public get hasDefaultSize(): Readonly<boolean> {
@@ -59,10 +70,13 @@ export class CanvasObject {
         
         this.renderFunction = renderFunction;
 
-        this.children = children;
+        this._children = children;
     }
     
     public render(context: CanvasRenderingContext2D, depth: number = 0): void {
+        if (this._parent !== null && depth === 0)
+            return; // The parent will render this object, so we skip rendering it here.
+        
         if (depth > 10) {
             console.warn('CanvasObject: Maximum render depth exceeded, stopping rendering to prevent stack overflow.');
             return;
@@ -78,7 +92,7 @@ export class CanvasObject {
 
         this.renderFunction(this, context);
 
-        this.children.forEach((child) => {
+        this._children.forEach((child) => {
             child.render(context, depth + 1);
         });
 
@@ -118,9 +132,9 @@ export class CanvasObject {
         );
         
         if (copyChildren) {
-            copy.children = this.children.map(child => child.createCopy(true));
+            copy._children = this._children.map(child => child.createCopy(true));
         } else {
-            copy.children = [];
+            copy._children = [];
         }
         
         return copy;
@@ -129,7 +143,10 @@ export class CanvasObject {
     public static setDebugMode(enabled: boolean): void {
         CanvasObject.debugMode = enabled;
     }
-    
+}
+
+export class Objects {
+
     public static ellipse(
         fillStyle: string,
         strokeStyle: string | null = null,
@@ -257,13 +274,15 @@ export class CanvasObject {
         fillStyle: string = '#000',
         alignment: CanvasTextAlign = 'left',
         baseline: CanvasTextBaseline = 'top',
+        multiline: boolean = false,
     ): RenderFunction {
-        return CanvasObject.dynamicText(
+        return Objects.dynamicText(
             () => text,
             font,
             fillStyle,
             alignment,
             baseline,
+            multiline,
         );
     }
 
@@ -273,23 +292,36 @@ export class CanvasObject {
         fillStyle: string = '#000',
         alignment: CanvasTextAlign = 'left',
         baseline: CanvasTextBaseline = 'top',
+        multiline: boolean = false,
     ): RenderFunction {
         return (object: CanvasObject, context: CanvasRenderingContext2D) => {
-            const _text = text();
-            context.font = font;
-            context.fillStyle = fillStyle;
-            context.textAlign = alignment;
-            context.textBaseline = baseline;
-
-            if (object.hasDefaultSize) {
-                object.size.x = 1;
-                object.size.y = 1;
+            if (object.hasDefaultSize)
+                object.size = Vector2f.one();
+            
+            let lines = [];
+            let meausrement: TextMetrics;
+            let height = 0;
+            if (multiline) {
+                const _text = text();
+                lines = _text.split('\n');
+                meausrement = context.measureText('M');
+                height = meausrement.actualBoundingBoxAscent + meausrement.actualBoundingBoxDescent;
+            }
+            else {
+                lines = [text()];
             }
 
-            context.fillText(
-                _text,
-                0, 0
-            );
+            for (let index = 0; index < lines.length; index++) {
+                context.font = font;
+                context.fillStyle = fillStyle;
+                context.textAlign = alignment;
+                context.textBaseline = baseline;
+
+                context.fillText(
+                    lines[index],
+                    0, height * index,
+                );
+            }
         };
     }
 
@@ -300,6 +332,7 @@ export class CanvasObject {
         yRange: {lower: number, upper: number} = {lower: -5, upper: 5},
         step: number = 0.1,
         dotX: () => number = () => 0,
+        lineFrequency: number = 1,
     ) {
         return (object: CanvasObject, context: CanvasRenderingContext2D) => {
             const positionOffset = new Vector2f(
@@ -348,7 +381,7 @@ export class CanvasObject {
                 );
 
                 // Lines for 1s
-                for (let i = Math.ceil(yRange.lower); i <= Math.floor(yRange.upper); i++) {
+                for (let i = Math.ceil(yRange.lower); i <= Math.floor(yRange.upper); i += lineFrequency) {
                     if (i === 0) continue;
 
                     const yPos = topLeft.y + object.size.y * (1 - (i - yRange.lower) / (yRange.upper - yRange.lower));
@@ -403,8 +436,8 @@ export class CanvasObject {
                     topLeft.y + object.size.y * heightPercentage + 5
                 );
 
-                // Lines for 1s
-                for (let i = Math.ceil(xRange.lower); i <= Math.floor(xRange.upper); i++) {
+                // Lines
+                for (let i = Math.ceil(xRange.lower); i <= Math.floor(xRange.upper); i += lineFrequency) {
                     if (i === 0) continue;
 
                     const xPos = topLeft.x + object.size.x * ((i - xRange.lower) / (xRange.upper - xRange.lower));

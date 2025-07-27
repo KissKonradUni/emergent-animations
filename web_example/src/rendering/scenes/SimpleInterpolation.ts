@@ -1,12 +1,12 @@
 import { Vector2f } from "../CanvasMath.ts";
-import { CanvasObject } from "../CanvasObject.ts";
+import { CanvasObject, Objects } from "../CanvasObject.ts";
 import { CanvasScene } from "../CanvasScene.ts";
 import { CanvasWrapper } from "../CanvasWrapper.ts";
 import { Time } from "../Time.ts";
-import { Easings, Interpolator, Sequence, Timer } from "../Sequences.ts";
+import { Easings, Interpolator, Animator, Timer } from "../Sequences.ts";
 
 export class SimpleInterpolation extends CanvasScene {
-    objects: {
+    override objects: {
         ballA: CanvasObject;
         ballB: CanvasObject;
         ballC: CanvasObject;
@@ -16,7 +16,7 @@ export class SimpleInterpolation extends CanvasScene {
         easingPlotC: CanvasObject;
     }
 
-    sequencers: {
+    override sequencers: {
         ballAInterpolator: Interpolator;
         ballBInterpolator: Interpolator;
         ballCInterpolator: Interpolator;
@@ -39,7 +39,7 @@ export class SimpleInterpolation extends CanvasScene {
 
         this.objects = {
             ballA: new CanvasObject(
-                CanvasObject.ellipse("#ff5722", "#ff0000"),
+                Objects.ellipse("#ff5722", "#ff0000"),
                 new Vector2f(340, 360),
                 new Vector2f(50, 50),
                 new Vector2f(1, 1),
@@ -47,7 +47,7 @@ export class SimpleInterpolation extends CanvasScene {
                 0,
             ),
             ballB: new CanvasObject(
-                CanvasObject.ellipse("#57ff22", "#00ff22"),
+                Objects.ellipse("#57ff22", "#00ff22"),
                 new Vector2f(640, 360),
                 new Vector2f(50, 50),
                 new Vector2f(1, 1),
@@ -55,7 +55,7 @@ export class SimpleInterpolation extends CanvasScene {
                 0,
             ),
             ballC: new CanvasObject(
-                CanvasObject.ellipse("#2257ff", "#2200ff"),
+                Objects.ellipse("#2257ff", "#2200ff"),
                 new Vector2f(940, 360),
                 new Vector2f(50, 50),
                 new Vector2f(1, 1),
@@ -64,7 +64,7 @@ export class SimpleInterpolation extends CanvasScene {
             ),
 
             easingPlotA: new CanvasObject(
-                CanvasObject.plotFunction(
+                Objects.plotFunction(
                     "easeInQuad: t ^ 2",
                     Easings.easeInQuad,
                     { lower: 0, upper: 1 },
@@ -79,7 +79,7 @@ export class SimpleInterpolation extends CanvasScene {
                 0,
             ),
             easingPlotB: new CanvasObject(
-                CanvasObject.plotFunction(
+                Objects.plotFunction(
                     "easeOutQuad: t * (2 - t)",
                     Easings.easeOutQuad,
                     { lower: 0, upper: 1 },
@@ -94,7 +94,7 @@ export class SimpleInterpolation extends CanvasScene {
                 0,
             ),
             easingPlotC: new CanvasObject(
-                CanvasObject.plotFunction(
+                Objects.plotFunction(
                     "easeInOutElastic: <...>",
                     Easings.easeInOutElastic,
                     { lower: 0, upper: 1 },
@@ -147,13 +147,13 @@ export class SimpleInterpolation extends CanvasScene {
 
     public override* sequence(): Generator<void> {
         while (true) {
-            yield* Sequence.runTogether([
+            yield* Animator.runTogether([
                 this.sequencers.ballAInterpolator,
                 this.sequencers.ballBInterpolator,
                 this.sequencers.ballCInterpolator,
             ]);
 
-            yield* Sequence.run(this.sequencers.timer);
+            yield* Animator.run(this.sequencers.timer);
 
             this.sequencers.ballAInterpolator.reverse();
             this.sequencers.ballBInterpolator.reverse();

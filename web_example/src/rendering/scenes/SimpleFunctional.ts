@@ -1,11 +1,11 @@
 import { Vector2f } from "../CanvasMath.ts";
-import { CanvasObject } from "../CanvasObject.ts";
+import { CanvasObject, Objects } from "../CanvasObject.ts";
 import { CanvasScene } from "../CanvasScene.ts";
 import { CanvasWrapper } from "../CanvasWrapper.ts";
 import { Time } from "../Time.ts";
 
 export class SimpleFunctional extends CanvasScene {
-    objects: {
+    override objects: {
         xPlot: CanvasObject;
         yPlot: CanvasObject;
 
@@ -18,10 +18,10 @@ export class SimpleFunctional extends CanvasScene {
 
         this.objects = {
             xPlot: new CanvasObject(
-                CanvasObject.plotFunction(
-                    "f(x) = cos(x + t)",
+                Objects.plotFunction(
+                    "f(x) = cos(α + t)",
                     (x) => Math.cos(x + time.now),
-                    { lower: -1, upper: 6 },
+                    { lower: -1, upper: 5 },
                     { lower: -2, upper: 2 },
                     0.1,
                 ),
@@ -32,10 +32,10 @@ export class SimpleFunctional extends CanvasScene {
                 0,
             ),
             yPlot: new CanvasObject(
-                CanvasObject.plotFunction(
-                    "f(y) = sin(y + t)",
+                Objects.plotFunction(
+                    "f(y) = sin(α + t)",
                     (x) => Math.sin(x + time.now),
-                    { lower: -1, upper: 6 },
+                    { lower: -1, upper: 5 },
                     { lower: -2, upper: 2 },
                     0.1,
                 ),
@@ -46,7 +46,7 @@ export class SimpleFunctional extends CanvasScene {
                 0,
             ),
             pathCircle: new CanvasObject(
-                CanvasObject.ellipse(
+                Objects.ellipse(
                     "transparent",
                     "#000",
                 ),
@@ -57,7 +57,7 @@ export class SimpleFunctional extends CanvasScene {
                 0,
             ),
             circle: new CanvasObject(
-                CanvasObject.ellipse(
+                Objects.ellipse(
                     "#ff5722",
                     "#ff8a50",
                 ),
@@ -66,7 +66,7 @@ export class SimpleFunctional extends CanvasScene {
                 new Vector2f(1, 1),
                 new Vector2f(0.5, 0.5),
                 0,
-            ),
+            )
         }
     }
 
