@@ -71,15 +71,17 @@ export class SimpleFunctional extends CanvasScene {
     }
 
     override render(): void {
-        this.objects.xPlot.render(this.context);
-        this.objects.yPlot.render(this.context);
-
-        this.objects.pathCircle.render(this.context);
-        
         this.objects.circle.position = new Vector2f(
             350 + 200 * Math.cos(this.time.now),
             360 + 200 * Math.sin(this.time.now)
         );
-        this.objects.circle.render(this.context);
+
+        this.context.lineWidth = 2;
+        this.renderInOrder(
+            this.objects.pathCircle,
+            this.objects.xPlot,
+            this.objects.yPlot,
+            this.objects.circle
+        );
     }
 }

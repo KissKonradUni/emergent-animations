@@ -26,6 +26,10 @@ export abstract class SequenceObject {
  * Animator class that manages the execution of sequence objects.
  */
 export class Animator {
+    /**
+     * Runs a single sequence object until it is finished.
+     * @param object The sequence object to run.
+     */
     public static* run(object: SequenceObject): Generator<void> {
         object.start();
         while (!object.tick()) {
@@ -34,7 +38,11 @@ export class Animator {
         return;
     }
 
-    public static* runTogether(runners: Array<SequenceObject>) {
+    /**
+     * Runs multiple sequence objects together until all are finished.
+     * @param runners An array of sequence objects to run together.
+     */
+    public static* runTogether(runners: Array<SequenceObject>): Generator<void> {
         runners.forEach((runner) => runner.start());
         let finished: boolean[];
         do {
@@ -196,6 +204,38 @@ export class Easings {
         }
     }
 
+    public static easeInCubic(t: number): number {
+        return t * t * t;
+    }
+
+    public static easeOutCubic(t: number): number {
+        return 1 - Math.pow(1 - t, 3);
+    }
+
+    public static easeInOutCubic(t: number): number {
+        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
+
+    public static easeInElastic(t: number): number {
+        const c4 = (2 * Math.PI) / 3;
+
+        return t === 0
+            ? 0
+            : t === 1
+            ? 1
+            : -Math.pow(2, 10 * t - 10) * Math.sin((t * 10 - 10.75) * c4);
+    }
+
+    public static easeOutElastic(t: number): number {
+        const c4 = (2 * Math.PI) / 3;
+
+        return t === 0
+            ? 0
+            : t === 1
+            ? 1
+            : Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1;
+    }
+
     public static easeInOutElastic(t: number): number {
         const c5 = (2 * Math.PI) / 4.5;
 
@@ -212,12 +252,14 @@ export class Easings {
 interface SequenceOptions {
     duration: number;
     easing?: EasingFunction;
+    loops?: boolean;
 }
 
 export class InterpolationSequence extends SequenceObject {
-    private values: Array<number>;
+    public values: Array<number>;
     private currentIndex: number = 0;
     private interpolator: Interpolator;
+    private endsOnStart: boolean;
 
     constructor(time: Readonly<Time>, setter: (value: number) => void, values: Array<number>, interpolatorOptions: SequenceOptions) {
         super(time);
@@ -228,6 +270,7 @@ export class InterpolationSequence extends SequenceObject {
             duration: interpolatorOptions.duration,
             easing: interpolatorOptions.easing,
         });
+        this.endsOnStart = interpolatorOptions.loops ?? false;
     }
 
     public override start(): void {
@@ -239,10 +282,11 @@ export class InterpolationSequence extends SequenceObject {
 
     public override tick(): boolean {
         // If the current index is out of bounds, the sequence is finished
-        if (this.currentIndex >= this.values.length) {
+        if (this.currentIndex >= this.values.length - (this.endsOnStart ? 0 : 1)) {
             return true;
         }
 
+        // If the interpolator is finished, move to the next value
         if (this.interpolator.tick()) {
             this.currentIndex++;
 

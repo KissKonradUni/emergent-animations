@@ -299,13 +299,11 @@ export class Objects {
                 object.size = Vector2f.one();
             
             let lines = [];
-            let meausrement: TextMetrics;
             let height = 0;
             if (multiline) {
                 const _text = text();
                 lines = _text.split('\n');
-                meausrement = context.measureText('M');
-                height = meausrement.actualBoundingBoxAscent + meausrement.actualBoundingBoxDescent;
+                height = parseInt(font);
             }
             else {
                 lines = [text()];
@@ -362,6 +360,7 @@ export class Objects {
                 context.stroke();
 
                 // Top of the Y-axis
+                context.font = '16px monospace, Consolas';
                 context.fillStyle = '#000';
                 context.textAlign = 'left';
                 context.textBaseline = 'top';
