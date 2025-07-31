@@ -7,7 +7,7 @@ import AboutRoute from './routes/About.svelte';
 import ExamplesRoute from './routes/examples/Examples.svelte';
 import FunctionalAnimations from './routes/examples/FunctionalAnimations.svelte';
 import FrameAnimations from './routes/examples/FrameAnimations.svelte';
-import CellularAutomatas from './routes/examples/CellularAutomatas.svelte';
+import RuleBasedAnimations from './routes/examples/RuleBasedAnimations.svelte';
 
 declare const __IS_LOCAL__: boolean;
 console.log(`Running in ${__IS_LOCAL__ ? 'local' : 'production'} mode.`);
@@ -32,7 +32,7 @@ const RouteArray = [
     { href: '/examples', component: ExamplesRoute, title: 'Examples'},
     { href: '/examples/functional-animations', component: FunctionalAnimations, title: 'Functional Animations' },
     { href: '/examples/frame-animations', component: FrameAnimations, title: 'Frame Animations' },
-    { href: '/examples/cellular-automatas', component: CellularAutomatas, title: 'Cellular Automatas' },
+    { href: '/examples/rule-based-animations', component: RuleBasedAnimations, title: 'Rule Based Animations' }
 ];
 
 export const Routes: Record<string, IRoute> = RouteArray.reduce((collection: Record<string, IRoute>, route) => {

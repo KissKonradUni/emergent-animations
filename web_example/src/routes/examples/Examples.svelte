@@ -12,8 +12,8 @@
         <Link href="/examples/frame-animations" cssClass="example-menu-item">
             Frame Animations
         </Link>
-        <Link href="/examples/cellular-automatas" cssClass="example-menu-item">
-            Cellular Automatas
+        <Link href="/examples/rule-based-animations" cssClass="example-menu-item">
+            Rule Based Animations
         </Link>
     </div>
 </Page>

@@ -17,12 +17,30 @@ export class Vector2f {
         return new Vector2f(this.x + other.x, this.y + other.y);
     }
 
+    addInPlace(other: Vector2f): Vector2f {
+        this.x += other.x;
+        this.y += other.y;
+        return this;
+    }
+    
     subtract(other: Vector2f): Vector2f {
         return new Vector2f(this.x - other.x, this.y - other.y);
     }
 
+    subtractInPlace(other: Vector2f): Vector2f {
+        this.x -= other.x;
+        this.y -= other.y;
+        return this;
+    }
+
     multiply(scalar: number): Vector2f {
         return new Vector2f(this.x * scalar, this.y * scalar);
+    }
+
+    multiplyInPlace(scalar: number): Vector2f {
+        this.x *= scalar;
+        this.y *= scalar;
+        return this;
     }
 
     scale(other: Vector2f): Vector2f {

@@ -5,12 +5,16 @@
     import Tab from '../../elements/Tab.svelte';
 
     import { GameOfLife } from '../../rendering/scenes/GameOfLife';
+    import { Boids } from '../../rendering/scenes/Boids';
 </script>
 
-<Page title="Cellular Automatas">
+<Page title="Rule Based Animations">
     <Tabs>
         <Tab title="Conway's Game of Life">
             <Canvas scene={GameOfLife.provide()}></Canvas>
         </Tab>
+        <Tab title="Boids">
+            <Canvas scene={Boids.provide()}></Canvas>
+        </Tab>            
     </Tabs>
 </Page>
