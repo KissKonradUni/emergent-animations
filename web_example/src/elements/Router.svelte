@@ -4,6 +4,10 @@
     let CurrentRoute = $state(getCurrentRoute());
     let CurrentComponent: typeof CurrentRoute.component | null = $derived(CurrentRoute?.component);
     let CurrentTitle: string = $derived(CurrentRoute?.title || '*');
+    
+    type PropsType = (typeof CurrentRoute) extends { component: infer C } ? C extends { $$prop_def: infer P } ? P : {} : {};
+    let CurrentProps: PropsType = $derived(CurrentRoute?.props || {});
+    
     let animation = null;
     
     onRouteChange((route) => {
@@ -29,5 +33,5 @@
     <title>Emergent Animations - {CurrentTitle}</title>
 </svelte:head>
 
-<CurrentComponent>
+<CurrentComponent {...CurrentProps}>
 </CurrentComponent>

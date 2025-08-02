@@ -56,17 +56,17 @@ class Agent {
 }
 
 export class Boids extends CanvasScene {
-    static readonly agentCount = 500;
+    static readonly agentCount = 300;
     private agents: Agent[];
 
-    static readonly separationDistance = 40;
-    static readonly separationStrength = 0.25;
+    static separationDistance = 40;
+    static separationStrength = 0.25;
     
-    static readonly alignmentDistance = 140;
-    static readonly alignmentStrength = 0.3;
+    static alignmentDistance = 140;
+    static alignmentStrength = 0.3;
     
-    static readonly cohesionDistance = 200;
-    static readonly cohesionStrength = 0.07;
+    static cohesionDistance = 200;
+    static cohesionStrength = 0.07;
 
     override sequencers: {
         timer: Timer;
@@ -193,5 +193,26 @@ export class Boids extends CanvasScene {
         for (const agent of this.agents) {
             agent.render(this.context);
         }
+
+        this.context.fillStyle = "#ffffff";
+        this.context.font = "16px Consolas, monospace";
+        this.context.textAlign = "left";
+        this.context.textBaseline = "top";
+        this.context.fillText(
+            `Boids: ${this.agents.length}`,
+            20, 20
+        );
+        this.context.fillText(
+            `Separation: ${Boids.separationDistance.toFixed(1)} @ ${Boids.separationStrength.toFixed(2)}`,
+            20, 40
+        );
+        this.context.fillText(
+            `Alignment: ${Boids.alignmentDistance.toFixed(1)} @ ${Boids.alignmentStrength.toFixed(2)}`,
+            20, 60
+        );
+        this.context.fillText(
+            `Cohesion: ${Boids.cohesionDistance.toFixed(1)} @ ${Boids.cohesionStrength.toFixed(2)}`,
+            20, 80
+        );
     }
 }
