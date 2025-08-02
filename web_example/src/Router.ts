@@ -32,17 +32,17 @@ export interface IRoute {
     props?: Record<string, unknown>;
 }
 
-interface Category {
+interface ExampleCategory {
     title: string;
-    path: string;
+    href: string;
     examples?: {
         name: string;
         scene: ReturnType<typeof CanvasScene.provide>;
     }[];
 }
 
-const ExampleCategories: Category[] = [
-    { title: "Functional Animations", path: "/examples/functional-animations",
+const Examples: ExampleCategory[] = [
+    { title: "Functional Animations", href: "/examples/functional-animations",
         examples: [
             { name: "Simple functional"   , scene: SimpleFunctional.provide() },
             { name: "Simple interpolation", scene: SimpleInterpolation.provide() },
@@ -50,13 +50,13 @@ const ExampleCategories: Category[] = [
             { name: "Complex sequence"    , scene: ComplexSequence.provide() },
         ]
     },
-    { title: "Frame Animations", path: "/examples/frame-animations",
+    { title: "Frame Animations", href: "/examples/frame-animations",
         examples: [
             { name: "Simple animation" , scene: SimpleFrameAnimation.provide() },
             { name: "Complex animation", scene: CatPendulum.provide() },
         ]
     },
-    { title: "Rule Based Animations", path: "/examples/rule-based-animations",
+    { title: "Rule Based Animations", href: "/examples/rule-based-animations",
         examples: [
             { name: "Game of Life", scene: GameOfLife.provide() },
             { name: "Boids"       , scene: Boids.provide() },
@@ -73,8 +73,8 @@ const RouteArray = [
     
     { href: "/examples", component: ExamplesRoute, title: "Examples" },
     
-    ...ExampleCategories.map(category => ({
-        href: category.path,
+    ...Examples.map(category => ({
+        href: category.href,
         title: category.title,
         component: ExamplePage,
         props: {

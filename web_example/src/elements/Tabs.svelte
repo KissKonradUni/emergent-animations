@@ -4,7 +4,7 @@
     let { children } = $props();
 
     let tabs = $state<{ title: string }[]>([]);
-    let activeTab = $state(0);
+    let activeTab = $state(parseInt(new URL(window.location.href).searchParams.get('tab') || '0', 10));
 
     setContext('tabs', {
         registerTab: (tab: { title: string }) => {
@@ -12,6 +12,12 @@
             return tabs.length - 1;
         },
         activeTab: () => activeTab
+    });
+
+    $effect(() => {
+        const url = new URL(window.location.href);
+        url.searchParams.set('tab', activeTab.toString());
+        window.history.replaceState({}, '', url.toString());
     });
 </script>
 
