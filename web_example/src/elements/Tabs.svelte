@@ -44,6 +44,8 @@
 
         padding: 0 0.125rem;
         gap: 0.5rem;
+
+        overflow: auto;
     }
 
     .tab-buttons button {

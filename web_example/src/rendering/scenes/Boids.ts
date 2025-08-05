@@ -188,7 +188,6 @@ class SpatialGrid {
 }
 
 interface RotationResult {
-    rotation: number;
     steeringVector: Vector2f;
     strength: number;
 }
@@ -234,28 +233,31 @@ export class Boids extends CanvasScene {
         const bounds = this.wrapper.resolution;
         const position = agent.position;
 
-        let rotation = agent.rotation;
+        let steeringVector = new Vector2f(0, 0);
         let strength = 0;
+        
         if (position.x < boundsAvoidanceDistance) {
-            rotation = 0;
+            steeringVector.x = 1;
             strength += boundsAvoidanceDistance - position.x;   
         } else if (position.x > bounds.x - boundsAvoidanceDistance) {
-            rotation = Math.PI;
+            steeringVector.x = -1;
             strength += position.x - (bounds.x - boundsAvoidanceDistance);
         }
+
         if (position.y < boundsAvoidanceDistance) {
-            rotation = Math.PI / 2;
+            steeringVector.y = 1;
             strength += boundsAvoidanceDistance - position.y;
         } else if (position.y > bounds.y - boundsAvoidanceDistance) {
-            rotation = -Math.PI / 2;
+            steeringVector.y = -1;
             strength += position.y - (bounds.y - boundsAvoidanceDistance);
         }
 
+        steeringVector = steeringVector.normalize();
+
         return {
-            rotation: rotation,
             steeringVector: new Vector2f(
-                Math.cos(rotation),
-                Math.sin(rotation)
+                steeringVector.x,
+                steeringVector.y
             ),
             strength: Math.pow(strength / boundsAvoidanceDistance, 2)
         };
@@ -289,7 +291,6 @@ export class Boids extends CanvasScene {
         }
 
         return {
-            rotation: separationRotation,
             steeringVector: new Vector2f(
                 Math.cos(separationRotation),
                 Math.sin(separationRotation)
@@ -324,7 +325,6 @@ export class Boids extends CanvasScene {
         }
 
         return {
-            rotation: alignmentRotation,
             steeringVector: new Vector2f(
                 Math.cos(alignmentRotation),
                 Math.sin(alignmentRotation)
@@ -358,7 +358,6 @@ export class Boids extends CanvasScene {
         }
 
         return {
-            rotation: cohesionRotation,
             steeringVector: new Vector2f(
                 Math.cos(cohesionRotation),
                 Math.sin(cohesionRotation)

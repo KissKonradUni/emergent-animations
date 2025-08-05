@@ -1,7 +1,78 @@
 \section{Introduction}
+\label{sec:intro}
 
-This paper explores how rule-based systems can be used to generate animated behavior from simple principles. The goal is to demonstrate how complexity can emerge from straightforward motion primitives and constraints.
+When the term "animation" or "motion graphics" is mentioned, people often think of the process of creating animated films or cartoons. This usually refers to hand-drawn animations or, more recently, computer-aided visual effects. However, the terms "animation" and "motion graphics" have a much broader meaning.
 
-As introduced by Reynolds in his seminal work on flocking behavior~\cite{boids87}, ...
-or 
-\textcite{boids87} introduced a distributed model for flocking behavior.
+As Adobe, an industry leader in digital media, defines it: "Motion graphics are essentially 'graphics with movement'." \cite{adobe-motion-graphics} This definition is much more in line with the theme of this thesis. What are procedural animations? What systems can be used to create them? What are rule-based animation systems, and what emergent behaviors can be achieved that are not foreseen by the designer? 
+
+The baseline is that everything that moves on the screen is animation, and everything that is animated can be considered motion graphics. This thesis will delve into the different algorithms, aspects, use cases, and applications of these systems, and how they are used everywhere in the digital world, even though we might not notice them at first glance.
+
+\subsection{Important Mathematical Concepts}
+\label{sec:important-mathematical-concepts}
+
+Before we begin, there are some essential mathematical concepts that will be used and referenced throughout this thesis. These concepts are fundamental to understanding the algorithms and systems discussed in the following sections.
+
+\subsubsection{Vectors}
+\label{sec:vectors}
+
+The widely accepted definition is: "A vector is a mathematical object that has both a magnitude and a direction." A key point many people miss is that the numerical definition of vectors does not inherently include direction or magnitude. A vector is simply defined as: "An \(n\)-dimensional array of numbers." This can represent a direction, a position, a size, or a scale.
+
+The context is crucial to understanding what a vector represents. I will talk more about the different contexts when we discuss affine transformations in Section \ref{sec:affine-transformations}. For now, let us discuss the vector operations that are important for our discussion.
+
+\begin{itemize}
+    \item \textbf{Addition and subtraction:} Vectors can be added or subtracted component-wise.
+    
+    \item \textbf{Scalar multiplication:} A vector can be multiplied by a scalar, which scales its magnitude without changing its direction. Simply put, we multiply each component of the vector by the scalar.
+    
+    \item \textbf{Length:} The length (or magnitude) of a vector can be calculated using the Pythagorean theorem. For a vector \(\vec{v} = [x_1, x_2, \ldots, x_n]\), the length is given by: \(\|\vec{v}\| = \sqrt{x_1^2 + x_2^2 + \ldots + x_n^2}\).
+    
+    \item \textbf{Normalization: } To normalize a vector, we divide it by its length: \(\vec{v}_{norm} = \frac{\vec{v}}{\|\vec{v}\|}\). This results in a unit vector with a length of 1. This operation is used when we only want to consider the direction of a vector without its magnitude.
+
+\pagebreak
+
+    \item \textbf{Convert to rotation and back: } This is not a standard vector operation, but rather an essential concept used in many of the implementations discussed in this thesis. In 2D, this is straightforward, as we can represent a vector as an angle. Note that these operations discard the magnitude of the vector.
+    
+    The angle can be calculated using the arctangent function: \(\theta = \text{atan}(\frac{y}{x})\) where our vector is \(\vec{v}=[x,y]\). 
+    
+    To convert back to a vector, we can use the cosine and sine functions: \(\vec{v} = [\cos(\theta), \sin(\theta)]\). 
+        
+    As it is not the focus of this thesis, I will not go into the details of 3D rotations using vectors, as Euler angles, quaternions, and rotation matrices deserve a whole discussion on their own.
+\end{itemize}
+
+\subsubsection{Affine Transformations}
+\label{sec:affine-transformations}
+
+Affine transformations are a set of operations that can be applied to vectors to change their position, orientation, and scale. They are fundamental in computer graphics. These transformations are commonly implemented using matrices, which allow for efficient computation and combination of multiple transformations.
+
+The implementations in this thesis will primarily use 2D affine transformations, so I will not explain the 3D transformations and matrices in detail. However, the concepts are similar, and the same principles apply.
+
+The main concept we need to understand is that every vector we define "lives" in a coordinate system that we can manipulate using these transformations. The base coordinate system that we use when drawing things on the screen depends on the implementation and the context. Most graphics APIs use a right-handed coordinate system, where the origin is at the center of the screen.
+
+Because I wanted to keep the implementations simple, I used an older concept where we define the coordinate system in the top-left corner of the screen, with the positive y-axis pointing downwards. This was a common practice in early computer graphics due to the way old displays and systems worked. Although this clashes with the standard coordinate system used in mathematics, it is still widely used in many graphics libraries and game engines today. When we begin using it in the implementations, it will become clear that it is indeed a simple convention.
+
+The operations we will use are the following:
+\begin{itemize}
+    \item \textbf{Translation:} This operation moves a vector by a certain amount in the x and y directions. For a vector \(\vec{v} = [x, y]\) and a translation vector \(\vec{t} = [t_x, t_y]\), the new vector after translation is given by: \(\vec{v'} = \vec{v} + \vec{t}\).
+
+    \item \textbf{Scaling:} This is not a standard vector operation, as there is no operation that multiplies a vector by a different scalar for each axis. Still, this is an immensely useful operation. This allows us to change the size of a vector unevenly in the x and y directions. For a vector \(\vec{v} = [x, y]\) and a scaling factor \(\vec{s} = [s_x, s_y]\), the new vector after scaling is given by: \(\vec{v'} = [x \cdot s_x, y \cdot s_y]\). Depending on the order of operations, this can be used as a \textbf{shearing} transformation if used right after a rotation.
+
+\pagebreak
+
+    \item \textbf{Rotation:} This operation rotates a vector around the origin by a certain angle. For a vector \(\vec{v} = [x, y]\) and an angle \(\theta\), the new vector after rotation is given by: \linebreak \(\vec{v'} = [x \cdot \cos(\theta) - y \cdot \sin(\theta), x \cdot \sin(\theta) + y \cdot \cos(\theta)]\) This transformation preserves the magnitude of the vector.
+\end{itemize}
+
+\vspace{5mm}
+
+The main concept I want to convey with these operations is that the coordinate system we use can (and should) be manipulated to achieve specific effects. This is infinitely more powerful than it seems at first glance, and I will demonstrate this using a few examples:
+
+\begin{itemize}
+    \item \textbf{I don't like the top-left origin: } We can simply create a scale transformation with \(\vec{s} = [1, -1]\) and a translation transformation with \(\vec{t} = [0, h]\) where \(h\) is the height of the screen. This will flip the y-axis and move the origin to the bottom-left corner of the screen. This transformation will likely be used in the implementations when dealing with physics simulations, as it is more intuitive to think of the ground as the bottom of the screen.
+
+    \item \textbf{I want this object to stay locked to another object: } We can think of these transformations as a stack. If we want an object to stay locked to another, we simply push the parent object's transformations onto the stack before applying the child object's transformations, then we draw the child object. This way, the child object will always be drawn in the correct position relative to the parent object, regardless of how the parent is transformed. And the stack analogy is a good way to think about how these transformations are applied in practice. 
+
+    In this context, we usually differentiate between the local coordinate system of an object (Object space), the global coordinate system (World space), and the screen coordinate system (Screen space). The transformations are applied in a specific order to achieve the desired effect.
+
+    Note: These transformations can be reversed by applying thier inverse values. For example, to reverse a translation, we can use \(\vec{t'} = [-t_x, -t_y]\). This is not necessary most of the time as we keep the stack of transformations in memory, but there can be cases when we need it.
+
+    \item \textbf{I don't want to rotate an object around the origin: } The order of operations matters a lot. If we first rotate an object, then translate it, the object will rotate around its own origin. If we want to rotate it around a different point, we can simply translate the object to the desired point, apply the rotation, and then translate it back. First, this sounds complicated, but seeing it in practice makes it clear most of the time. The fact that these things can be done even on paper by hand often helps understand the concepts better.
+\end{itemize}
