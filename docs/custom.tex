@@ -1,0 +1,20 @@
+\usepackage{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{Note} {
+  enhanced,
+  breakable,
+  colback=blue!3!white,      
+  colframe=blue!60!black,    
+  colbacktitle=blue!20!white, 
+  coltitle=black,            
+  left=2mm,
+  before skip=10pt,
+  after skip=10pt,
+  boxrule=0pt,
+  borderline={0.5pt}{0pt}{blue!60!black},
+  borderline west={4pt}{0pt}{blue!60!black},
+  fonttitle=\bfseries,
+  sharp corners,
+  title={\textbf{Note}}
+}

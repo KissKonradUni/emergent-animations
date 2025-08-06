@@ -3,20 +3,16 @@
 	import Link from "../../elements/Link.svelte";
     import "./examples.css";
 
-    
+    import { Examples } from "../../Router";
 </script>
 
 <Page title="Examples">
     <div class="list">
-        <Link href="/examples/functional-animations" cssClass="example-menu-item">
-            Functional Animations
+        {#each Examples as example}
+        <Link href={example.href} cssClass="example-menu-item">
+            {example.title}
         </Link>
-        <Link href="/examples/frame-animations" cssClass="example-menu-item">
-            Frame Animations
-        </Link>
-        <Link href="/examples/rule-based-animations" cssClass="example-menu-item">
-            Rule Based Animations
-        </Link>
+        {/each}
     </div>
 </Page>
 

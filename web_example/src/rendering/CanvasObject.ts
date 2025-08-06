@@ -508,4 +508,116 @@ export class Objects {
         };
     }
 
+    public static axes(xRange: Vector2f, yRange: Vector2f, gridSizing: number, invertYAxis: boolean = true): RenderFunction {
+        return (object: CanvasObject, context: CanvasRenderingContext2D) => {            
+            const offset = new Vector2f(
+                (object.pivot.x) * object.size.x,
+                (object.pivot.y) * object.size.y
+            );
+            context.save();
+            context.translate(
+                -offset.x,
+                -offset.y,
+            );
+
+            // Find the 0 in the ranges
+            // Y-axis is inverted in canvas coordinates, so we need to adjust the zero point accordingly.
+            const xZero =  (xRange.x < 0 && xRange.y > 0) ? -xRange.x / (xRange.y - xRange.x) : 0;
+            let yZero = ((yRange.x < 0 && yRange.y > 0) ? -yRange.x / (yRange.y - yRange.x) : 0);
+            if (invertYAxis) {
+                yZero = 1 - yZero; // Invert the Y-axis for canvas coordinates
+            }
+
+            // Draw the grid
+            const gridPixels = new Vector2f(
+                object.size.x / (xRange.y - xRange.x) * gridSizing,
+                object.size.y / (yRange.y - yRange.x) * gridSizing,
+            );
+            const xOffset = xZero * object.size.x;
+            const yOffset = yZero * object.size.y;
+
+            context.strokeStyle = '#00000088';
+            context.lineWidth = 1;
+            context.beginPath();
+            for (let x = Math.ceil(xRange.x / gridSizing) * gridPixels.x; x <= object.size.x - xOffset + 0.1; x += gridPixels.x) {
+                context.moveTo(x + xOffset, 0);
+                context.lineTo(x + xOffset, object.size.y);
+            }
+            for (let y = Math.ceil(-yRange.y / gridSizing) * gridPixels.y; y <= object.size.y - yOffset + 0.1; y += gridPixels.y) {
+                context.moveTo(0, y + yOffset);
+                context.lineTo(object.size.x, y + yOffset);
+            }
+            context.stroke();
+
+            // Draw the X-axis
+            context.strokeStyle = '#f00';
+            context.fillStyle = '#f00';
+            context.lineWidth = 2;
+            context.beginPath();
+            context.moveTo(0                 , yZero * object.size.y    );
+            context.lineTo(object.size.x     , yZero * object.size.y    );
+            context.lineTo(object.size.x - 20, yZero * object.size.y + 5);
+            context.lineTo(object.size.x - 20, yZero * object.size.y - 5);
+            context.lineTo(object.size.x     , yZero * object.size.y    );
+            context.stroke();
+            context.fill();
+
+            context.font = '16px monospace, Consolas';
+            context.textAlign = 'left';
+            context.textBaseline = 'top';
+            context.fillText(
+                xRange.x.toString(),
+                5, yZero * object.size.y + 5
+            );
+            context.textAlign = 'right';
+            context.fillText(
+                xRange.y.toString(),
+                object.size.x - 5, yZero * object.size.y + 5
+            );
+
+            // Center text
+            context.fillStyle = '#fff';
+            context.textAlign = 'left';
+            context.textBaseline = 'bottom';
+            context.fillText(
+                `${Math.min(Math.max(xRange.x, 0), xRange.y).toString()};${Math.min(Math.max(yRange.x, 0), yRange.y).toString()}`,
+                xZero * object.size.x + 5, yZero * object.size.y - 5
+            );
+
+            // Draw the Y-axis
+            context.strokeStyle = '#0f0';
+            context.fillStyle = '#0f0';
+            context.beginPath();
+            if (invertYAxis) {
+                context.moveTo(xZero * object.size.x    , object.size.y);
+                context.lineTo(xZero * object.size.x    , 0            );
+                context.lineTo(xZero * object.size.x + 5, 20           );
+                context.lineTo(xZero * object.size.x - 5, 20           );
+                context.lineTo(xZero * object.size.x    , 0            );
+            } else {
+                context.moveTo(xZero * object.size.x    , 0                 );
+                context.lineTo(xZero * object.size.x    , object.size.y     );
+                context.lineTo(xZero * object.size.x + 5, object.size.y - 20);
+                context.lineTo(xZero * object.size.x - 5, object.size.y - 20);
+                context.lineTo(xZero * object.size.x    , object.size.y     );
+            }
+            context.stroke();
+            context.fill();
+
+            context.textAlign = 'right';
+            context.textBaseline = 'top';
+            context.fillText(
+                invertYAxis ? yRange.y.toString() : yRange.x.toString(),
+                xZero * object.size.x - 5, 5
+            );
+            context.textBaseline = 'bottom';
+            context.fillText(
+                invertYAxis ? yRange.x.toString() : yRange.y.toString(),
+                xZero * object.size.x - 5, object.size.y - 5
+            );
+
+            context.restore();
+        }
+    }
+
 }

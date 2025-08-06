@@ -19,7 +19,7 @@ export class SimpleFunctional extends CanvasScene {
         this.objects = {
             xPlot: new CanvasObject(
                 Objects.plotFunction(
-                    "f(x) = cos(α + t)",
+                    "f(x, α, t) = cos(α + t)",
                     (x) => Math.cos(x + time.now),
                     { lower: -1, upper: 5 },
                     { lower: -2, upper: 2 },
@@ -33,7 +33,7 @@ export class SimpleFunctional extends CanvasScene {
             ),
             yPlot: new CanvasObject(
                 Objects.plotFunction(
-                    "f(y) = sin(α + t)",
+                    "f(y, α, t) = sin(α + t)",
                     (x) => Math.sin(x + time.now),
                     { lower: -1, upper: 5 },
                     { lower: -2, upper: 2 },
