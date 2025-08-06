@@ -10,9 +10,11 @@ The baseline is that everything that moves on the screen is animation, and every
 \subsection{Important Mathematical Concepts}
 \label{sec:important-mathematical-concepts}
 
-Before we begin, there are some essential mathematical concepts that will be used and referenced throughout this thesis. These concepts are fundamental to understanding the algorithms and systems discussed in the following sections.
+Before we begin, there are some essential mathematical concepts that will be used and referenced throughout this thesis. These concepts are fundamental to understanding the algorithms and systems discussed in the following sections. \footnote{
+    The mathematical definitions and operations presented here are simplified for clarity. In practice, especially in computer graphics, these operations are often implemented using matrices for efficiency and to handle more complex transformations. For more information, an excellent resource can be found at \cite{learn-opengl}.
+}
 
-\subsubsection{Vectors}
+\subsection{Vectors}
 \label{sec:vectors}
 
 The widely accepted definition is: "A vector is a mathematical object that has both a magnitude and a direction." A key point many people miss is that the numerical definition of vectors does not inherently include direction or magnitude. A vector is simply defined as: "An \(n\)-dimensional array of numbers." This can represent a direction, a position, a size, or a scale.
@@ -39,7 +41,7 @@ The context is crucial to understanding what a vector represents. I will talk mo
     As it is not the focus of this thesis, I will not go into the details of 3D rotations using vectors, as Euler angles, quaternions, and rotation matrices deserve a whole discussion on their own.
 \end{itemize}
 
-\subsubsection{Affine Transformations}
+\subsection{Affine Transformations}
 \label{sec:affine-transformations}
 
 Affine transformations are a set of operations that can be applied to vectors to change their position, orientation, and scale. They are fundamental in computer graphics. These transformations are commonly implemented using matrices, which allow for efficient computation and combination of multiple transformations.
@@ -48,9 +50,8 @@ The implementations in this thesis will primarily use 2D affine transformations,
 
 The main concept we need to understand is that every vector we define "lives" in a coordinate system that we can manipulate using these transformations. The base coordinate system that we use when drawing things on the screen depends on the implementation and the context. Most graphics APIs use a right-handed coordinate system, where the origin is at the center of the screen.
 
-Because I wanted to keep the implementations simple, I used an older concept where we define the coordinate system in the top-left corner of the screen, with the positive y-axis pointing downwards. This was a common practice in early computer graphics due to the way old displays and systems worked. Although this clashes with the standard coordinate system used in mathematics, it is still widely used in many graphics libraries and game engines today. When we begin using it in the implementations, it will become clear that it is indeed a simple convention.
+Because I wanted to keep the implementations simple, I used an older concept where we define the coordinate system in the top-left corner of the screen, with the positive y-axis pointing downwards. This was a common practice in early computer graphics due to the way old displays and systems worked. Although this clashes with the standard coordinate system used in mathematics, it is still widely used in many graphics libraries and game engines today. When we begin using it in the implementations, it will become clear that it is indeed a simple convention. The operations we will use are the following:
 
-The operations we will use are the following:
 \begin{itemize}
     \item \textbf{Translation:} This operation moves a vector by a certain amount in the x and y directions. For a vector \(\vec{v} = [x, y]\) and a translation vector \(\vec{t} = [t_x, t_y]\), the new vector after translation is given by: \(\vec{v'} = \vec{v} + \vec{t}\).
 
@@ -61,7 +62,7 @@ The operations we will use are the following:
     \item \textbf{Rotation:} This operation rotates a vector around the origin by a certain angle. For a vector \(\vec{v} = [x, y]\) and an angle \(\theta\), the new vector after rotation is given by: \linebreak \(\vec{v'} = [x \cdot \cos(\theta) - y \cdot \sin(\theta), x \cdot \sin(\theta) + y \cdot \cos(\theta)]\) This transformation preserves the magnitude of the vector.
 \end{itemize}
 
-\vspace{5mm}
+\vspace{10mm}
 
 The main concept I want to convey with these operations is that the coordinate system we use can (and should) be manipulated to achieve specific effects. This is infinitely more powerful than it seems at first glance, and I will demonstrate this using a few examples:
 
@@ -76,3 +77,5 @@ The main concept I want to convey with these operations is that the coordinate s
 
     \item \textbf{I don't want to rotate an object around the origin: } The order of operations matters a lot. If we first rotate an object, then translate it, the object will rotate around its own origin. If we want to rotate it around a different point, we can simply translate the object to the desired point, apply the rotation, and then translate it back. First, this sounds complicated, but seeing it in practice makes it clear most of the time. The fact that these things can be done even on paper by hand often helps understand the concepts better.
 \end{itemize}
+
+\pagebreak
