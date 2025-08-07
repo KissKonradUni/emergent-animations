@@ -73,8 +73,7 @@ The main concept I want to convey with these operations is that the coordinate s
 
     \item \textbf{I want this object to stay locked to another object: } We can think of these transformations as a stack. If we want an object to stay locked to another, we simply push the parent object's transformations onto the stack before applying the child object's transformations, then we draw the child object. This way, the child object will always be drawn in the correct position relative to the parent object, regardless of how the parent is transformed. And the stack analogy is a good way to think about how these transformations are applied in practice. 
 
-    \phantomsection\label{sec:spaces}
-    \begin{Note} In this context, we usually differentiate between the local coordinate system of an object (\underline{Object space}), the global coordinate system (\underline{World space}), and the screen coordinate system (\underline{Screen space}). The transformations are applied in a specific order to achieve the desired effect.
+    \begin{Note} In this context, we usually differentiate between the local coordinate system of an object (\underline{Object space}), the global coordinate system (\underline{World space}), and the screen coordinate system (\underline{Screen space}).
     \end{Note}
 
     \begin{Note} These transformations can be reversed by applying thier inverse values. For example, to reverse a translation, we can use \(\vec{t'} = [-t_x, -t_y]\). This is not necessary most of the time as we keep the stack of transformations in memory, but there can be cases when we need it.

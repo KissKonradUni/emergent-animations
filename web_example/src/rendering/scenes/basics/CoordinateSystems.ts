@@ -8,8 +8,6 @@ import { Time } from "../../Time.ts";
 export class CoordinateSystems extends CanvasScene {
     override objects: {
         screenSpace: CanvasObject;
-        worldSpace: CanvasObject;
-
         ball: CanvasObject;
         hat: CanvasObject;
         localSpace: CanvasObject;
@@ -19,13 +17,6 @@ export class CoordinateSystems extends CanvasScene {
         timer: Timer;
         interpolator: Interpolator;
     }
-
-    /**
-     * State of the scene:
-     * 0 -10: Displaying world space
-     * 11-20: Displaying screen space
-     */
-    private counter: number = 0;
     
     constructor(wrapper: CanvasWrapper, context: CanvasRenderingContext2D, time: Readonly<Time>) {
         super(wrapper, context, time);
@@ -33,13 +24,6 @@ export class CoordinateSystems extends CanvasScene {
         this.objects = {
             screenSpace: new CanvasObject(
                 Objects.axes(new Vector2f(0, 1280), new Vector2f(0, 720), 80, false),
-                new Vector2f(40, 40),
-                new Vector2f(1200, 640),
-                new Vector2f(1, 1),
-                new Vector2f(0, 0),
-            ),
-            worldSpace: new CanvasObject(
-                Objects.axes(new Vector2f(-640, 640), new Vector2f(0, 720), 80, true),
                 new Vector2f(40, 40),
                 new Vector2f(1200, 640),
                 new Vector2f(1, 1),
@@ -67,7 +51,7 @@ export class CoordinateSystems extends CanvasScene {
         this.objects.ball.append(this.objects.localSpace);
 
         this.sequencers = {
-            timer: new Timer(time, 0.25),
+            timer: new Timer(time, 1),
             interpolator: new Interpolator(
                 time,
                 (t: number) => this.objects.ball.position.x = t,
@@ -85,8 +69,6 @@ export class CoordinateSystems extends CanvasScene {
         while (true) {
             yield* Animator.run(this.sequencers.interpolator);
 
-            this.counter = (this.counter + 1) % 20; // Step the states
-
             this.sequencers.interpolator.reverse();
 
             yield* Animator.run(this.sequencers.timer);
@@ -94,32 +76,15 @@ export class CoordinateSystems extends CanvasScene {
     }
 
     override render(): void {
-        if (this.counter <= 10) {
-            this.objects.worldSpace.render(this.context);
-            this.objects.ball.render(this.context);
-        } else {
-            this.objects.screenSpace.render(this.context);
-            this.objects.ball.render(this.context);
-        }
-
+        this.objects.screenSpace.render(this.context);
+        this.objects.ball.render(this.context);
+        
         this.context.fillStyle = '#fff';
         this.context.font = '20px Arial';
         this.context.textAlign = 'center';
         this.context.textBaseline = 'top';
         this.context.fillText(
-            `Currently displaying: ${this.counter <= 10 ? 'World Space' : 'Screen Space'}`,
-            this.wrapper.resolution.x / 2, 10
-        );
-
-        const worldPosition = 
-        new Vector2f(
-            640, 720
-        ).subtract(this.objects.ball.position).scale(new Vector2f(-1, 1));
-
-        this.context.fillText(
-            this.counter <= 10 ?
-            `World Space Position: (${worldPosition.x.toFixed(2)}, ${worldPosition.y.toFixed(2)})` :
-            `Screen Space Position: (${this.objects.ball.position.x.toFixed(2)}, ${this.objects.ball.position.y.toFixed(2)})`,
+            `Ball Position: (${this.objects.ball.position.x.toFixed(2)}, ${this.objects.ball.position.y.toFixed(2)})`,
             this.wrapper.resolution.x / 2, this.wrapper.resolution.y - 30
         );
     }

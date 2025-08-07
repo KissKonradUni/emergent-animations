@@ -555,11 +555,12 @@ export class Objects {
             context.lineWidth = 2;
             context.beginPath();
             context.moveTo(0                 , yZero * object.size.y    );
-            context.lineTo(object.size.x     , yZero * object.size.y    );
+            context.lineTo(object.size.x - 20, yZero * object.size.y    );
+            context.stroke();
+            context.beginPath();
             context.lineTo(object.size.x - 20, yZero * object.size.y + 5);
             context.lineTo(object.size.x - 20, yZero * object.size.y - 5);
             context.lineTo(object.size.x     , yZero * object.size.y    );
-            context.stroke();
             context.fill();
 
             context.font = '16px monospace, Consolas';
@@ -589,19 +590,22 @@ export class Objects {
             context.fillStyle = '#0f0';
             context.beginPath();
             if (invertYAxis) {
-                context.moveTo(xZero * object.size.x    , object.size.y);
+                context.moveTo(xZero * object.size.x    , object.size.y - 20);
                 context.lineTo(xZero * object.size.x    , 0            );
+                context.stroke();
+                context.beginPath();
                 context.lineTo(xZero * object.size.x + 5, 20           );
                 context.lineTo(xZero * object.size.x - 5, 20           );
                 context.lineTo(xZero * object.size.x    , 0            );
             } else {
                 context.moveTo(xZero * object.size.x    , 0                 );
-                context.lineTo(xZero * object.size.x    , object.size.y     );
+                context.lineTo(xZero * object.size.x    , object.size.y - 20);
+                context.stroke();
+                context.beginPath();
                 context.lineTo(xZero * object.size.x + 5, object.size.y - 20);
                 context.lineTo(xZero * object.size.x - 5, object.size.y - 20);
                 context.lineTo(xZero * object.size.x    , object.size.y     );
             }
-            context.stroke();
             context.fill();
 
             context.textAlign = 'right';

@@ -57,6 +57,7 @@ export class CanvasWrapper {
     }
     private _resolutionScale: number = 1.0;
     private _dpi: number = globalThis.devicePixelRatio || 2;
+    public backgroundColor: string = "#444";
 
     private _scene: CanvasScene | null = null;
     private _sequenceGenerator: Generator<void>;
@@ -168,7 +169,7 @@ export class CanvasWrapper {
         this._context.setTransform(scale, 0, 0, scale, offsetX, offsetY);
 
         // Fill the background
-        this._context.fillStyle = "#444";
+        this._context.fillStyle = this.backgroundColor;
         this._context.fillRect(0, 0, this._resolution.x, this._resolution.y);
 
         // Draw a border around the virtual resolution
