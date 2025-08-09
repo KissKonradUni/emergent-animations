@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { onMount } from "svelte";
+    import { onDestroy, onMount } from "svelte";
     import { CanvasWrapper } from "../rendering/CanvasWrapper";
     import type { CanvasScene, SceneProvider } from "../rendering/CanvasScene.ts";
 	import { CanvasObject } from "../rendering/CanvasObject";
@@ -13,6 +13,12 @@
 
     let wrapper: CanvasWrapper;
     let isFullscreen = $state(false);
+
+    const CanvasListener = () => {
+        if (!document.fullscreenElement) {
+            isFullscreen = false;
+        }
+    };
 
     onMount(() => {
         wrapper = new CanvasWrapper(
@@ -36,11 +42,12 @@
             isFullscreen = true;
         });
 
-        document.addEventListener("fullscreenchange", () => {
-            if (!document.fullscreenElement) {
-                isFullscreen = false;
-            }
-        });
+        document.addEventListener("fullscreenchange", CanvasListener);
+    });
+
+    onDestroy(() => {
+        wrapper.destroy();
+        document.removeEventListener("fullscreenchange", CanvasListener);
     });
 </script>
 

@@ -75,6 +75,8 @@ export class CanvasWrapper {
     private _topFps: number = 60;
     private _bottomFps: number = -1;
 
+    private _renderCallbackHandle: number | null = null;
+
     private _fpsPlot: CanvasObject = new CanvasObject(
         Objects.plotFunction(
             "",
@@ -110,7 +112,7 @@ export class CanvasWrapper {
             throw new Error('Failed to get 2D context from canvas');
         }
 
-        globalThis.requestAnimationFrame(this.onRenderFrame.bind(this));
+        this._renderCallbackHandle = globalThis.requestAnimationFrame(this.onRenderFrame.bind(this));
 
         const onResizeListener = () => {
             this._canvas.width  = this._wrapperElement.clientWidth  * this._dpi * this._resolutionScale;
@@ -140,7 +142,7 @@ export class CanvasWrapper {
         // Draw debug information
         this.drawDebugInfo();
 
-        globalThis.requestAnimationFrame(this.onRenderFrame.bind(this));
+        this._renderCallbackHandle = globalThis.requestAnimationFrame(this.onRenderFrame.bind(this));
     }
 
     private setupTransformations(): void {
@@ -291,5 +293,13 @@ export class CanvasWrapper {
         this._wrapperElement.insertBefore(this._glHandler._glCanvas, this._canvas);
 
         return this._glHandler._glContext;
+    }
+
+    destroy() {
+        if (this._renderCallbackHandle)
+            globalThis.cancelAnimationFrame(this._renderCallbackHandle);
+
+        if (this._scene)
+            console.log(`CanvasWrapper (${this._instanceId}) with scene "${this._scene.getFileInfo().split("/").pop()}" destroyed.`);
     }
 }
