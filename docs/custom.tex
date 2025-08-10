@@ -21,3 +21,20 @@
   title={\textbf{Note \arabic{NoteCounter}} \label{note:\arabic{NoteCounter}}},
   before upper={\stepcounter{NoteCounter}},
 }
+
+\newtcolorbox{ExampleBox}[1] {
+    breakable,
+    colback=red!8!white,      
+    colframe=red!60!white,    
+    left=2mm,
+    before skip=10pt,
+    after skip=10pt,
+    borderline={0.5pt}{0pt}{red!60!white},
+    title={\small\textbf{#1}},
+    sharp corners
+}
+\newcommand{\Example}[2]{
+    \begin{ExampleBox}{#2}
+        \footnotesize\url{#1}
+    \end{ExampleBox}
+}
