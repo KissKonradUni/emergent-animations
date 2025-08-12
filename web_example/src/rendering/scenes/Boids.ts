@@ -1,6 +1,7 @@
 import { Vector2f } from "../CanvasMath.ts";
 import { CanvasObject } from "../CanvasObject.ts";
 import { CanvasScene } from "../CanvasScene.ts";
+import { UIButton, UIContainer, UILabel, UITrackBar } from "../CanvasUI.ts";
 import { CanvasWrapper } from "../CanvasWrapper.ts";
 import { Time } from "../Time.ts";
 
@@ -20,14 +21,13 @@ function hsv2rgb(h: number, s: number, v: number): [number, number, number] {
 const topLeftColor = { r: 200, g: 128, b: 255 };
 const bottomRightColor = { r: 200, g: 255, b: 128 };
 
-const agentCount = 500;
-const rotationSpeedLimit = Math.PI * 4; // radians per second
-
-const movementSpeed = 300;
-const visionRange = 100;
-const alignmentRange = 40;
-const cohesionRange = 60;
-const boundsAvoidanceDistance = 200;
+let agentCount = 500;
+let rotationSpeedLimit = Math.PI * 4; // radians per second
+let movementSpeed = 300;
+let separationRange = 100;
+let alignmentRange = 40;
+let cohesionRange = 60;
+let boundsAvoidanceDistance = 200;
 
 function boidRenderer(resolution: Vector2f, grid: SpatialGrid): (object: CanvasObject, context: CanvasRenderingContext2D) => void {
     return (object: CanvasObject, context: CanvasRenderingContext2D) => {
@@ -57,52 +57,62 @@ function boidRenderer(resolution: Vector2f, grid: SpatialGrid): (object: CanvasO
         context.lineTo( -5,  0);
         context.lineTo(-10, -7);
         context.fill();
-
+        
         if (CanvasObject.debugMode) {
             context.save();
             context.rotate(-object.rotation);
-
+            
             // Screen space
-
-            const neighbours = grid.getObjectsInRange(object.position.x, object.position.y, visionRange);
+            
+            const neighbours = grid.getObjectsInRange(object.position.x, object.position.y, separationRange);
             context.strokeStyle = "#ff0000";
             for (const neighbour of neighbours) {
                 if (neighbour === object) continue;
                 const line = neighbour.position.subtract(object.position);
-                if (line.length() > visionRange) continue;
+                if (line.length() > separationRange) continue;
                 context.beginPath();
                 context.moveTo(0, 0);
                 context.lineTo(line.x, line.y);
                 context.stroke();
             }
-
+            
             context.restore();
-
+            
             // Object space
-
+            
             context.strokeStyle = "#00ff00";
             context.lineWidth = 2;
             
             context.beginPath();
             context.moveTo(0, 0);
             context.lineTo(50, 0);
-            context.arc(0, 0, visionRange, 0, Math.PI * 2);
+            context.arc(0, 0, separationRange, 0, Math.PI * 2);
+            context.stroke();
+
+            context.strokeStyle = "#0000ff";
+            context.beginPath();
+            context.arc(0, 0, alignmentRange, 0, Math.PI * 2);
+            context.stroke();
+
+            context.strokeStyle = "#ffff00";
+            context.beginPath();
+            context.arc(0, 0, cohesionRange, 0, Math.PI * 2);
             context.stroke();
         }
     }
 }
 
 /**
- * SpatialGrid partitions the 2D space into a grid of cells to enable efficient neighbor queries.
- * Each cell contains a list of CanvasObjects, allowing fast lookup of nearby agents for boid behaviors.
- */
+* SpatialGrid partitions the 2D space into a grid of cells to enable efficient neighbor queries.
+* Each cell contains a list of CanvasObjects, allowing fast lookup of nearby agents for boid behaviors.
+*/
 class SpatialGrid {
     // First index is row, second index is column, third index is the list of objects in that cell
     private grid: CanvasObject[][][] = [];
     private resolution: Vector2f;
     private cellCount: number;
     private cellSize: Vector2f;
-
+    
     constructor(cellCount: number, resolution: Vector2f) {
         this.resolution = resolution;
         this.cellCount = cellCount;
@@ -114,26 +124,26 @@ class SpatialGrid {
         for (let i = 0; i < cellCount; i++) {
             // Initialize each row of the grid
             this.grid[i] = [];
-
+            
             // Initialize each cell in the row
             for (let j = 0; j < cellCount; j++) {
                 this.grid[i][j] = [];
             }
         }
     }
-
+    
     public add(object: CanvasObject): void {
         // Calculate the grid cell index based on the object's position
         const x = Math.floor(object.position.x / (this.resolution.x / this.cellCount));
         const y = Math.floor(object.position.y / (this.resolution.y / this.cellCount));
-
+        
         // Ensure the indices are within bounds
         if (x >= 0 && x < this.cellCount && y >= 0 && y < this.cellCount) {
             // Add the object to the appropriate cell
             this.grid[y][x].push(object);
         }
     }
-
+    
     public getObjectsInCell(x: number, y: number): CanvasObject[] {
         // Ensure the indices are within bounds
         if (x < 0 || x >= this.cellCount || y < 0 || y >= this.cellCount) {
@@ -142,10 +152,10 @@ class SpatialGrid {
         // Return the objects in the specified cell
         return this.grid[y][x] || [];
     }
-
+    
     public getObjectsInRange(x: number, y: number, range: number): CanvasObject[] {
         const objects: CanvasObject[] = [];
-
+        
         // Calculate the range in terms of grid cells
         const startX = Math.max(0, Math.floor((x - range) / this.cellSize.x));
         const endX = Math.min(this.cellCount - 1, Math.ceil((x + range) / this.cellSize.x));
@@ -160,7 +170,7 @@ class SpatialGrid {
         }
         return objects;
     }
-
+    
     public clear(): void {
         // Clear the grid by reinitializing it
         for (let i = 0; i < this.cellCount; i++) {
@@ -169,13 +179,13 @@ class SpatialGrid {
             }
         }
     }
-
+    
     public debugRender(context: CanvasRenderingContext2D): void {
         const cellSizeX = this.resolution.x / this.cellCount;
         const cellSizeY = this.resolution.y / this.cellCount;
         context.strokeStyle = "#000000";
         context.lineWidth = 1;
-
+        
         context.beginPath();
         for (let i = 1; i < this.cellCount; i++) {
             context.moveTo(i * cellSizeX, 0);
@@ -193,46 +203,147 @@ interface RotationResult {
 }
 
 export class Boids extends CanvasScene {    
-    private grid: SpatialGrid;
-    private agents: CanvasObject[];
-    private newRotations: Float32Array = new Float32Array(agentCount);
-
+    private grid!: SpatialGrid;
+    private agents!: CanvasObject[];
+    private newRotations!: Float32Array;
+    
     private debugAgent: CanvasObject | null = null;
-
+    
     constructor(wrapper: CanvasWrapper, context: CanvasRenderingContext2D, time: Readonly<Time>) {
         super(wrapper, context, time);
+        
+        this.spawnAgents(wrapper, agentCount);
+        this.debugAgent = this.agents[Math.floor(Math.random() * this.agents.length)];
+        
+        const windowSize = new Vector2f(300, 654); // Trial and error
+        const window = new UIContainer(
+            windowSize,
+            wrapper.resolution.subtract(windowSize).subtract(new Vector2f(10, 10))
+        );
+        window.visible = false;
+        new UILabel(
+            window, () => `Agent Count`,
+        );
+        new UITrackBar(
+            window, 0, 1500, agentCount,
+            (value: number) => agentCount = Math.round(value),
+        );
+        new UIButton(
+            window, "Respawn Agents",
+            () => {
+                this.spawnAgents(wrapper, agentCount),
+                this.debugAgent = this.agents[Math.floor(Math.random() * this.agents.length)];
+            }
+        );
+        new UILabel(
+            window, () => `Rotation Speed Limit (rad/s)`,
+        );
+        new UITrackBar(
+            window, 0, Math.PI * 16, rotationSpeedLimit,
+            (value: number) => rotationSpeedLimit = value,
+        );
+        new UILabel(
+            window, () => `Movement Speed (px/s)`,
+        );
+        new UITrackBar(
+            window, 0, 1000, movementSpeed,
+            (value: number) => movementSpeed = value,
+        );
+        new UILabel(
+            window, () => `Separation Range (px)`,
+        );
+        new UITrackBar(
+            window, 1, 500, separationRange,
+            (value: number) => separationRange = value,
+        );
+        new UILabel(
+            window, () => `Alignment Range (px)`,
+        );
+        new UITrackBar(
+            window, 1, 500, alignmentRange,
+            (value: number) => alignmentRange = value,
+        );
+        new UILabel(
+            window, () => `Cohesion Range (px)`,
+        );
+        new UITrackBar(
+            window, 1, 500, cohesionRange,
+            (value: number) => cohesionRange = value,
+        );
+        new UILabel(
+            window, () => `Bounds Avoidance Distance (px)`,
+        );
+        new UITrackBar(
+            window, 1, 500, boundsAvoidanceDistance,
+            (value: number) => boundsAvoidanceDistance = value,
+        );
+        new UIButton(
+            window, "Restore Defaults",
+            () => {
+                agentCount = 500;
+                rotationSpeedLimit = Math.PI * 4;
+                movementSpeed = 300;
+                separationRange = 100;
+                alignmentRange = 40;
+                cohesionRange = 60;
+                boundsAvoidanceDistance = 200;
+                this.spawnAgents(wrapper, agentCount);
+                this.debugAgent = this.agents[Math.floor(Math.random() * this.agents.length)];
+            }
+        );
 
-        this.grid = new SpatialGrid(Math.ceil(Math.sqrt(agentCount)), wrapper.resolution);
-
-        const x = Math.ceil(Math.sqrt(agentCount * wrapper.resolution.x / wrapper.resolution.y));
-        const y = Math.ceil(agentCount / x);
+        const UIHideWindow = new UIContainer(
+            new Vector2f(42, 42),
+            new Vector2f(wrapper.resolution.x - 52, wrapper.resolution.y - 50)
+        );
+        new UIButton(
+            UIHideWindow, "҉", // Random character
+            () => {
+                window.visible = !window.visible;
+                UIHideWindow.position.x = window.visible
+                    ? wrapper.resolution.x - 62 - windowSize.x
+                    : wrapper.resolution.x - 52;
+            }
+        );
+        
+        wrapper.ui.addElement(window);
+        wrapper.ui.addElement(UIHideWindow);
+    }
+    
+    private spawnAgents(wrapper: CanvasWrapper, count: number) {
+        const x = Math.ceil(Math.sqrt(count * wrapper.resolution.x / wrapper.resolution.y));
+        const y = Math.ceil(count / x);
         const cellSize = wrapper.resolution.x / x;
-        console.log(`Boids grid: ${x} x ${y} (${agentCount} agents)`);
 
+        this.grid = new SpatialGrid(Math.ceil(Math.sqrt(count)), wrapper.resolution);
+        console.log(`Boids grid: ${x} x ${y} (${count} agents) with cell size ${cellSize}`);
+
+        this.newRotations = new Float32Array(count);
+        
         const renderer = boidRenderer(wrapper.resolution, this.grid);
-        this.agents = Array.from({ length: agentCount }, (_, index) => {
+        this.agents = Array.from({ length: count }, (_, index) => {
             const object = new CanvasObject(
                 renderer,
                 new Vector2f(
-                    (index % x) * (wrapper.resolution.x / x) + cellSize / 2,
-                    Math.floor(index / x) * (wrapper.resolution.y / y) + cellSize / 2
+                    clamp((index % x) * (wrapper.resolution.x / x) + cellSize / 2, 0, wrapper.resolution.x),
+                    clamp(Math.floor(index / x) * (wrapper.resolution.y / y) + cellSize / 2, 0, wrapper.resolution.y)
                 ),
-                new Vector2f( 20,  20),
+                new Vector2f(20, 20),
                 Vector2f.one(),
                 new Vector2f(0.5, 0.5),
-                Math.random() * Math.PI * 2,
+                Math.random() * Math.PI * 2
             );
             this.grid.add(object);
             return object;
         });
-
-        this.debugAgent = this.agents[Math.floor(Math.random() * this.agents.length)];
+        console.log(`Spawned ${this.agents.length} agents.`);
+        return renderer;
     }
-
+    
     private turnAwayFromBounds(agent: CanvasObject): RotationResult {
         const bounds = this.wrapper.resolution;
         const position = agent.position;
-
+        
         let steeringVector = new Vector2f(0, 0);
         let strength = 0;
         
@@ -243,7 +354,7 @@ export class Boids extends CanvasScene {
             steeringVector.x = -1;
             strength += position.x - (bounds.x - boundsAvoidanceDistance);
         }
-
+        
         if (position.y < boundsAvoidanceDistance) {
             steeringVector.y = 1;
             strength += boundsAvoidanceDistance - position.y;
@@ -251,9 +362,9 @@ export class Boids extends CanvasScene {
             steeringVector.y = -1;
             strength += position.y - (bounds.y - boundsAvoidanceDistance);
         }
-
+        
         steeringVector = steeringVector.normalize();
-
+        
         return {
             steeringVector: new Vector2f(
                 steeringVector.x,
@@ -262,17 +373,17 @@ export class Boids extends CanvasScene {
             strength: Math.pow(strength / boundsAvoidanceDistance, 2)
         };
     }
-
+    
     private separate(agent: CanvasObject, neighbours: CanvasObject[]): RotationResult {
         const separationVector = new Vector2f(0, 0);
         let closestDistance = Infinity;
         let count = 0;
-
+        
         for (const neighbour of neighbours) {
             if (neighbour === agent) continue;
             const offset = agent.position.subtract(neighbour.position);
             const distance = offset.length();
-            if (distance < visionRange && distance > 0) {
+            if (distance < separationRange && distance > 0) {
                 if (distance < closestDistance) {
                     closestDistance = distance;
                 }
@@ -281,15 +392,15 @@ export class Boids extends CanvasScene {
                 count++;
             }
         }
-
+        
         let separationRotation = 0;
         let separationStrength = 0;
-
+        
         if (count > 0) {
             separationRotation = Math.atan2(separationVector.y, separationVector.x);
-            separationStrength = Math.max(0, visionRange - closestDistance) / visionRange;
+            separationStrength = Math.max(0, separationRange - closestDistance) / separationRange;
         }
-
+        
         return {
             steeringVector: new Vector2f(
                 Math.cos(separationRotation),
@@ -298,7 +409,7 @@ export class Boids extends CanvasScene {
             strength: Math.pow(separationStrength, 4)
         };
     }
-
+    
     private align(agent: CanvasObject, neighbours: CanvasObject[]): RotationResult {
         const alignmentVector = new Vector2f(0, 0);
         let count = 0;
@@ -314,16 +425,16 @@ export class Boids extends CanvasScene {
                 count++;
             }
         }
-
+        
         let alignmentRotation = agent.rotation;
         let alignmentStrength = 0;
-
+        
         if (count > 0) {
             alignmentVector.multiplyInPlace(1 / count);
             alignmentRotation = Math.atan2(alignmentVector.y, alignmentVector.x);
             alignmentStrength = 1;
         }
-
+        
         return {
             steeringVector: new Vector2f(
                 Math.cos(alignmentRotation),
@@ -332,11 +443,11 @@ export class Boids extends CanvasScene {
             strength: Math.pow(alignmentStrength, 2)
         };
     }
-
+    
     private cohere(agent: CanvasObject, neighbours: CanvasObject[]): RotationResult {
         const cohesionVector = new Vector2f(0, 0);
         let count = 0;
-
+        
         for (const neighbour of neighbours) {
             if (neighbour === agent) continue;
             const offset = neighbour.position.subtract(agent.position);
@@ -346,7 +457,7 @@ export class Boids extends CanvasScene {
                 count++;
             }
         }
-
+        
         let cohesionRotation = agent.rotation;
         let cohesionStrength = 0;
         if (count > 0) {
@@ -356,7 +467,7 @@ export class Boids extends CanvasScene {
             // More neighbours the merrier
             cohesionStrength = (1 - (1 / count)) * 0.5; 
         }
-
+        
         return {
             steeringVector: new Vector2f(
                 Math.cos(cohesionRotation),
@@ -365,7 +476,7 @@ export class Boids extends CanvasScene {
             strength: Math.pow(cohesionStrength, 2)
         };
     }
-        
+    
     private moveAgents(time: Readonly<Time>): void {
         for (const agent of this.agents) {
             const velocity = new Vector2f(
@@ -373,44 +484,44 @@ export class Boids extends CanvasScene {
                 Math.sin(agent.rotation) * movementSpeed * time.delta
             );
             agent.position.addInPlace(velocity);
-
+            
             agent.position.x = clamp(agent.position.x, 0, this.wrapper.resolution.x);
             agent.position.y = clamp(agent.position.y, 0, this.wrapper.resolution.y);
         }
     }
-
+    
     public override render(): void {
         if (CanvasObject.debugMode) {
             this.grid.debugRender(this.context);
         }
-
+        
         for (let i = 0; i < this.agents.length; i++) {
             const agent = this.agents[i];
-            const neighbours = this.grid.getObjectsInRange(agent.position.x, agent.position.y, visionRange);
-
+            const neighbours = this.grid.getObjectsInRange(agent.position.x, agent.position.y, separationRange);
+            
             const awayRotation       = this.turnAwayFromBounds(agent);
             const separationRotation = this.separate(agent, neighbours);
             const alignmentRotation  = this.align(agent, neighbours);
             const cohesionRotation   = this.cohere(agent, neighbours);
-
+            
             // Weighted average of steering vectors
             let steering = awayRotation.steeringVector.multiply(awayRotation.strength)
-                .add(separationRotation.steeringVector.multiply(separationRotation.strength))
-                .add(alignmentRotation.steeringVector.multiply(alignmentRotation.strength))
-                .add(cohesionRotation.steeringVector.multiply(cohesionRotation.strength));
-
+            .add(separationRotation.steeringVector.multiply(separationRotation.strength))
+            .add(alignmentRotation.steeringVector.multiply(alignmentRotation.strength))
+            .add(cohesionRotation.steeringVector.multiply(cohesionRotation.strength));
+            
             if (steering.length() === 0) {
                 steering = new Vector2f(Math.cos(agent.rotation), Math.sin(agent.rotation));
             } else {
                 steering = steering.normalize();
             }
-
+            
             const newAngle = Math.atan2(steering.y, steering.x);
-
+            
             // Shortest angle difference (wrap between -PI and PI)
             let rotationDifference = newAngle - agent.rotation;
             rotationDifference = Math.atan2(Math.sin(rotationDifference), Math.cos(rotationDifference));
-
+            
             const limitedRotation = clamp(
                 rotationDifference,
                 -rotationSpeedLimit * this.time.delta,
@@ -418,28 +529,27 @@ export class Boids extends CanvasScene {
             );
             this.newRotations[i] = (agent.rotation + limitedRotation + Math.PI * 2) % (Math.PI * 2);
         }
-
+        
         for (let i = 0; i < this.agents.length; i++) {
             const agent = this.agents[i];
             agent.rotation = this.newRotations[i];
         }
-
+        
         this.moveAgents(this.time);
-
+        
         this.grid.clear();
         for (const agent of this.agents) {
             this.grid.add(agent);
         }
-            
         
         for (const agent of this.agents) {
             const wasDebugMode = CanvasObject.debugMode;
             if (wasDebugMode && this.debugAgent !== agent) {
                 CanvasObject.setDebugMode(false);
             }
-
+            
             agent.render(this.context);
-
+            
             CanvasObject.setDebugMode(wasDebugMode);
         }
     }

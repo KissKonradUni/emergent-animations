@@ -1,6 +1,7 @@
 import { Vector2f } from "./CanvasMath.ts";
 import { CanvasObject, Objects } from "./CanvasObject.ts";
 import { CanvasScene, SceneProvider } from "./CanvasScene.ts";
+import { CanvasUI } from "./CanvasUI.ts";
 import { Time } from "./Time.ts";
 
 class ExampleCanvasScene extends CanvasScene {
@@ -49,12 +50,22 @@ export class CanvasWrapper {
     
     private _resolution: Vector2f = new Vector2f(1280, 720);
     public get resolution(): Readonly<Vector2f> { return this._resolution; }
-    public get clientSize(): Vector2f {
-        return new Vector2f(
-            this._wrapperElement.clientWidth ,
+    
+    private _clientSize: Vector2f = new Vector2f(1280, 720);
+    public get clientSize(): Readonly<Vector2f> {
+        this._clientSize.set(
+            this._wrapperElement.clientWidth,
             this._wrapperElement.clientHeight
         );
+        return this._clientSize;
     }
+
+    private _scale: number = 1.0;
+    public get scale(): Readonly<number> { return this._scale; }
+
+    private _offset: Vector2f = new Vector2f(0, 0);
+    public get offset(): Readonly<Vector2f> { return this._offset; }
+
     private _resolutionScale: number = 1.0;
     private _dpi: number = globalThis.devicePixelRatio || 2;
     public backgroundColor: string = "#444";
@@ -93,6 +104,9 @@ export class CanvasWrapper {
         new Vector2f(0.0, 0.0),
     );
 
+    private _ui: CanvasUI;
+    public get ui(): Readonly<CanvasUI> { return this._ui; }
+
     constructor(canvas: HTMLCanvasElement, wrapperElement: HTMLElement, sceneProvider: SceneProvider) {
         this._instanceId = CanvasWrapper.IdCounter++;
         
@@ -101,6 +115,7 @@ export class CanvasWrapper {
         this._canvas = canvas;
         this._wrapperElement = wrapperElement;
         this._context = canvas.getContext('2d')!;
+        this._ui = new CanvasUI(this, this._canvas, this._context);
         
         this._scene = sceneProvider(this, this._context, this._time);
         if (this._scene === null)
@@ -139,6 +154,9 @@ export class CanvasWrapper {
         this._scene!.render();
         this._sequenceGenerator.next();
 
+        // Draw the UI
+        this._ui.render();
+
         // Draw debug information
         this.drawDebugInfo();
 
@@ -161,14 +179,14 @@ export class CanvasWrapper {
         const scaleY = this._canvas.height / this._resolution.y;
         
         // Use the smaller scale to ensure the entire virtual resolution fits within the canvas
-        const scale = Math.min(scaleX, scaleY);
+        this._scale = Math.min(scaleX, scaleY);
         
         // Center the virtual resolution in the canvas
-        const offsetX = (this._canvas.width  - this._resolution.x * scale) / 2;
-        const offsetY = (this._canvas.height - this._resolution.y * scale) / 2;
+        this._offset.x = (this._canvas.width  - this._resolution.x * this._scale) / 2;
+        this._offset.y = (this._canvas.height - this._resolution.y * this._scale) / 2;
         
         // Apply the transformation
-        this._context.setTransform(scale, 0, 0, scale, offsetX, offsetY);
+        this._context.setTransform(this._scale, 0, 0, this._scale, this.offset.x, this._offset.y);
 
         // Fill the background
         this._context.fillStyle = this.backgroundColor;
