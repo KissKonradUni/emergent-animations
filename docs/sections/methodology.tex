@@ -1,0 +1,63 @@
+\section{Methodology}
+\label{sec:methodology}
+
+There are some major measurement methods that I will use to evaluate the results of different techniques and algorithms. These methods will help in understanding the performance, repetition, and overall "feel" of the animations created by the systems. While some of these measurements are subjective, they will provide a good basis for comparison.
+
+\subsection{Deviation}
+\label{subsec:deviation}
+
+Deviation (\(\bar{D}\)), as defined by me in these measurements, is a measure of how much the actual motion deviates from the expected or desired motion. It can be quantified by calculating the difference between the actual position of an animated object and its expected position at a given time. 
+
+I will define \(1\) as the maximum deviation, where the motion has no correlation with the expected motion, and \(0\) as the minimum deviation, where the motion is the exact same as the expected motion.
+
+I will not provide an exact formula here, as it will depend on the specific use case.
+
+The expected position will usually be a linear interpolation between two keyframes, while the actual position will be determined by the algorithm used to generate the motion. This means that easing functions, procedural noise and any other factors that affect the motion will be taken into account.
+
+This statistic may be a bit biased towards stiff, robotic motions, as they will have a lower deviation from the expected motion. However, it is still a useful metric to evaluate the overall smoothness and naturalness of the motion. There will be a lot of techniques where this will be omitted entirely, because the motion is purely procedural and we cannot define an expected motion. In these cases, we will state that the deviation metric is \(1\).
+
+\subsection{Repetition}
+\label{subsec:repetition}
+
+Repetition (\({R}\)) is a measurement of how often of how prone an algorithm is to repetition. This will be a value between \(0\) and \(1\), where \(0\) means the algorithm is purely chaotic, while \(1\) means the algorithm is completely deterministic and will always produce the same motion for the same input. Of course, due to the pseudorandomness of computers, we could achieve deterministic results for every algorithm; therefore, as an extra rule, I will always use a different seed for each run of the algorithm.
+
+\subsection{Control}
+\label{subsec:control}
+
+Control (\({C}\)) is a measure of how much control the designer has over the final result of the animation. This is a subjective measurement, with these possible values: "none", "low", "medium", "high" and "total". This represents how much influence the designer has over the final result of the animation. A stiff motion from point A to point B would have a "total" control, while a physics simulation would have "low" control, as the designer can only influence the initial conditions and the parameters of the simulation, but cannot control the final result.
+
+\subsection{Feel}
+\label{subsec:feel}
+
+Feel (\(F\)) is another subjective measurement, which will be based on my personal experience and the feedback of others. It will be a value between \(0\) and \(1\), where \(0\) means the motion feels unnatural and robotic, while \(1\) means the motion feels natural and fluid. This will be based on my personal experience with the animation, as well as the feedback of others who have seen the animation. The pool will not be large, but I will try to get feedback from as many people as possible. This will be a good indicator of how well the algorithm works in practice, and how well it can create natural-looking motion.
+
+\subsection{Performance}
+\label{subsec:performance}
+
+Lastly, a purely objective measurement: performance (\(P(...)\)). This will be measured in ms, and will be the time the algorithm takes to calculate the position and rotation of the objects for the next frame. Every algorithm mentioned here will be tuned for real-time performance, so the goal is to achieve a frame rate of at least \(60\) FPS, which means the algorithm should take no more than \(16.67\) ms per frame (with leaving some room for rendering). 
+
+If other parameters, like the number of objects and such heavily influence this parameter, I will define an extrapolated function from many measurements. It is similar to the "Big O" notation. It will always be a function defined by me, that tries to estimate the time it takes to run the algorithm for a given input.
+
+\subsection{Summary}
+\label{subsec:methodology-summary}
+
+\begin{table}[h]
+    \centering
+    \begin{tblr}{
+        colspec={|l|c|c|X[8]|},
+        vlines = {abovepos = 1, belowpos = 1},
+        hlines,
+        hline{2} = {1}{-}{solid},
+        hline{2} = {2}{-}{solid},
+        row{1} = {font=\bfseries}
+    }
+        Measurement   & Range         & Example            & Description \\
+        Deviation     & \(0\) to \(1\) & \(\bar{D}=0.2\)   & How much the actual motion deviates from the expected motion \\
+        Repetition    & \(0\) to \(1\) & \(R=0.9\)         & How prone the algorithm is to repetition \\
+        Control       & ...            & \(C=\)"high"      & How much control the designer has over the final result \\
+        Feel          & \(0\) to \(1\) & \(F=0.2\)         & How natural the motion feels \\
+        Performance   & \(P(...)\)     & \(P(n)=n\cdot k\) & The time the algorithm takes to calculate the next frame (where \(n\) is the number of objects and \(k\) is a constant cost) \\
+    \end{tblr}
+    \caption{Summary of measurement methods}
+    \label{tab:methodology-summary}
+\end{table}

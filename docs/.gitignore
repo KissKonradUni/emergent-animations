@@ -11,3 +11,5 @@ output/main.out
 output/main.pdf
 output/main.run.xml
 output/main.toc
+
+**/**/*.bak
