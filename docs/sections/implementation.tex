@@ -1,4 +1,51 @@
+\pagebreak
+
 \section{Implementation}
 \label{sec:implementation}
 
-Some text here.
+Before diving into the algorithms and techniques, it is essential to have a basic understanding of the implementations used in this thesis.
+
+A really big point of this thesis is to show that we can create complex animations and behaviors with simple rules and systems. For this statement to be true, I recommend looking at every example as its own separate tiny implementation, disregarding my framework. The tools I created for these animations can be found in many other libraries and frameworks; the abstract concepts are the important part.
+
+\begin{Note}
+    My implementation is unnecessarily complex for most of the algorithms discussed in this thesis. It is designed to be a general-purpose framework that can handle various types of procedural animations and motion graphics. The complexity arises from the need to accommodate different algorithms, techniques, and use cases, as well as to provide a flexible and extensible architecture.
+\end{Note}
+
+From this point on, I recommend having access to a device with a larger screen, preferably a computer or laptop. I also recommend reading the thesis in pdf form instead of printed form, as I will provide links to the \examples on my website. 
+
+Motion graphics are inherently visual, and having the ability to interact with the examples and see them in action will greatly enhance your understanding of the concepts discussed. I will provide still images for some relevant examples, but they will not be as informative as the actual animations.
+
+\begin{Note}
+    The code snippets provided here will be simplified, but the full implementations are available on my GitHub \repository.
+\end{Note}
+
+The implementation is built on top of the HTML5 Canvas API \cite{mdn-canvas-api}, which is purely used for rendering, dynamic frame timing \footnote{A common practice in real-time rendering is to use the time between the current and the previous frame to calculate the delta time. Multiplying with the delta time allows us to create framerate-independent animations.}, and some basic input handling. No external libraries are used for the examples. The website itself is built using Svelte \cite{svelte}, but that is not relevant to the thesis.
+
+\pagebreak
+
+\subsection{Architectural Overview}
+\label{subsec:architectural-overview}
+
+The implementation is structured as a modular system, reminiscent of a game engine. While it does not adhere to a strict design pattern, it is best described as a component-based, data-driven architecture utilizing imperative sequencing\footnote{This approach requires explicit definition of animation sequences and rendering logic/order to ensure correct functionality.} for animation and rendering logic.
+
+\subsubsection{Canvas Wrapper}
+\label{subsubsec:canvas-wrapper}
+
+The canvas wrapper is a big, monolithic class that handles the rendering, input, timing, and some other animation related tasks. It in itself does not contain anything related to any algorithm, but provides an even blank slate for every implementation.
+
+It defines a World Space using affine transformations, which allows easy positioning and scaling of objects with hard-coded values. It has a \textbf{resolution} property with default values of 1280x720, but it can be changed to any other resolution. It also has \textbf{scale} and \textbf{offset} properties, which are automatically calculated using the actual size of the canvas element and the \textbf{resolution} property. This allows us to always have a consistent coordinate system, regardless of the actual size and aspect ratio of the canvas.
+
+The class also provides simple debugging tools like a frame rate graph, information about the canvas, and outlines objects rendered with their pivot points\footnote{The pivot point is the point around which the object is rotated and scaled. It is usually the center of the object, but it can be set to anywhere. This is useful for animations where we want to rotate or scale the object around a specific point, like a character's feet or hands.}. It stores and passes a reference to the canvas element and the rendering context to the algorithms, so any default canvas functionality can be used without any additional setup.
+
+It also provides a simple UI object that allows us to create settings and panels without the need for HTML.
+
+While the canvas wrapper is a big class, it in itself does basically nothing. The actual functionality is provided by the \textbf{canvas scene} class. Every example will have its own scene, which is a collection of objects and algorithms that work together to create the desired animation.
+
+\pagebreak
+
+\subsubsection{Canvas Scene}
+\label{subsubsec:canvas-scene}
+
+For starters I will show the bare minimum you need to create a scene:
+
+\inputminted{typescript}{code/minimum-scene.tex}

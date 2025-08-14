@@ -10,10 +10,19 @@ MAIN_TEX = "main.tex"
 
 YELLOW_COLOR = "\033[93m"
 
+# Windows only
+PYTHON_PATH = "%USERPROFILE%\\.pyenv\\pyenv-win\\versions\\3.10.11"
+
+def add_python_exe_to_path():
+    if sys.platform == "win32":
+        python_exe = os.path.join(os.path.expandvars(PYTHON_PATH), "python.exe")
+        if os.path.exists(python_exe):
+            os.environ["PATH"] += os.pathsep + os.path.dirname(python_exe)
+
 def run_latexmk():
     try:
         subprocess.run([
-            "latexmk", "-pdf", "-interaction=nonstopmode", "-f",
+            "latexmk", "-pdf", "-silent", "-use-make", "-interaction=nonstopmode",
             "-output-directory=" + OUTPUT_DIR, MAIN_TEX
         ], check=True)
     except FileNotFoundError:
@@ -46,6 +55,7 @@ def clean():
 
 if __name__ == "__main__":
     os.makedirs(OUTPUT_DIR, exist_ok=True)
+    add_python_exe_to_path()
 
     if len(sys.argv) > 1:
         if sys.argv[1] == "clean":

@@ -1,3 +1,5 @@
+\pagebreak
+
 \section{Methodology}
 \label{sec:methodology}
 
@@ -19,12 +21,14 @@ This statistic may be a bit biased towards stiff, robotic motions, as they will 
 \subsection{Repetition}
 \label{subsec:repetition}
 
-Repetition (\({R}\)) is a measurement of how often of how prone an algorithm is to repetition. This will be a value between \(0\) and \(1\), where \(0\) means the algorithm is purely chaotic, while \(1\) means the algorithm is completely deterministic and will always produce the same motion for the same input. Of course, due to the pseudorandomness of computers, we could achieve deterministic results for every algorithm; therefore, as an extra rule, I will always use a different seed for each run of the algorithm.
+Repetition (\({R}\)) is a measurement of how prone an algorithm is to repetition. This will be a value between \(0\) and \(1\), where \(0\) means the algorithm is purely chaotic, while \(1\) means the algorithm is completely deterministic and will always produce the same motion for the same input. Of course, due to the pseudorandomness of computers, we could achieve deterministic results for every algorithm; therefore, as an extra rule, I will always use a different seed for each run of the algorithm where randomness is involved.
 
 \subsection{Control}
 \label{subsec:control}
 
 Control (\({C}\)) is a measure of how much control the designer has over the final result of the animation. This is a subjective measurement, with these possible values: "none", "low", "medium", "high" and "total". This represents how much influence the designer has over the final result of the animation. A stiff motion from point A to point B would have a "total" control, while a physics simulation would have "low" control, as the designer can only influence the initial conditions and the parameters of the simulation, but cannot control the final result.
+
+\pagebreak
 
 \subsection{Feel}
 \label{subsec:feel}
@@ -61,3 +65,5 @@ If other parameters, like the number of objects and such heavily influence this 
     \caption{Summary of measurement methods}
     \label{tab:methodology-summary}
 \end{table}
+
+I will provide a similar table for every relevant algorithm. There will be some algorithms that are included for the sake of building up the complexity, but cannot/will not be measured, as they are not relevant to the final results. In these cases, I will state that the measurement is not applicable (N/A).

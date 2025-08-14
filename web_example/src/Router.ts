@@ -9,7 +9,6 @@ import ExamplePage from "./routes/examples/ExamplePage.svelte";
 
 import { CanvasScene } from "./rendering/CanvasScene.ts";
 
-import { CoordinateSystems } from "./rendering/scenes/basics/CoordinateSystems.ts";
 import { SimpleFunctional } from "./rendering/scenes/SimpleFunctional.ts";
 import { SimpleInterpolation } from "./rendering/scenes/SimpleInterpolation.ts";
 import { SimpleSequence } from "./rendering/scenes/SimpleSequence.ts";
@@ -43,11 +42,6 @@ interface ExampleCategory {
 }
 
 export const Examples: ExampleCategory[] = [
-    { title: "Basics", href: "/examples/basics",
-        examples: [
-            { name: "Coordinate Systems", scene: CoordinateSystems.provide() },
-        ]
-    },
     { title: "Functional Animations", href: "/examples/functional-animations",
         examples: [
             { name: "Simple functional"   , scene: SimpleFunctional.provide() },

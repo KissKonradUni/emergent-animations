@@ -13,3 +13,4 @@ output/main.run.xml
 output/main.toc
 
 **/**/*.bak
+**/_minted/*.minted
