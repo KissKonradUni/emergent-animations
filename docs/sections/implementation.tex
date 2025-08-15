@@ -28,6 +28,8 @@ The implementation is built on top of the HTML5 Canvas API \cite{mdn-canvas-api}
 
 The implementation is structured as a modular system, reminiscent of a game engine. While it does not adhere to a strict design pattern, it is best described as a component-based, data-driven architecture utilizing imperative sequencing\footnote{This approach requires explicit definition of animation sequences and rendering logic/order to ensure correct functionality.} for animation and rendering logic.
 
+\vspace{45pt}
+
 \subsubsection{Canvas Wrapper}
 \label{subsubsec:canvas-wrapper}
 
@@ -35,17 +37,60 @@ The canvas wrapper is a big, monolithic class that handles the rendering, input,
 
 It defines a World Space using affine transformations, which allows easy positioning and scaling of objects with hard-coded values. It has a \textbf{resolution} property with default values of 1280x720, but it can be changed to any other resolution. It also has \textbf{scale} and \textbf{offset} properties, which are automatically calculated using the actual size of the canvas element and the \textbf{resolution} property. This allows us to always have a consistent coordinate system, regardless of the actual size and aspect ratio of the canvas.
 
-The class also provides simple debugging tools like a frame rate graph, information about the canvas, and outlines objects rendered with their pivot points\footnote{The pivot point is the point around which the object is rotated and scaled. It is usually the center of the object, but it can be set to anywhere. This is useful for animations where we want to rotate or scale the object around a specific point, like a character's feet or hands.}. It stores and passes a reference to the canvas element and the rendering context to the algorithms, so any default canvas functionality can be used without any additional setup.
+The class also provides simple debugging tools like a frame rate graph and some information about the canvas. It stores and passes a reference to the canvas element and the rendering context to the algorithms, so any default canvas functionality can be used without any additional setup.
 
 It also provides a simple UI object that allows us to create settings and panels without the need for HTML.
 
 While the canvas wrapper is a big class, it in itself does basically nothing. The actual functionality is provided by the \textbf{canvas scene} class. Every example will have its own scene, which is a collection of objects and algorithms that work together to create the desired animation.
 
-\pagebreak
+\vspace{45pt}
 
 \subsubsection{Canvas Scene}
 \label{subsubsec:canvas-scene}
 
-For starters I will show the bare minimum you need to create a scene:
+For starters, I will show the bare minimum you need to create a scene:
 
 \inputminted{typescript}{code/minimum-scene.tex}
+
+In its current form, it is completely empty, but it has clear definitions. First, you define all the textures, objects, and animators you want to use in the scene. In the \textbf{constructor} you initialize these objects and call the parent \textbf{constructor} (super). In the \textbf{sequence} generator function, you may define an animation sequence. In the \textbf{render} function, you can define the rendering logic, which will be called every frame. This usually involves calling {\footnotesize\texttt{this.renderInOrder([...])}}. This is another imperative part of the implementation, as you have to define the order in which the objects are rendered. The library has no automatic z-indexing or depth-sorting, so explicit rendering order is used.
+
+\begin{Note}
+    In this animation system, \textbf{generator functions} are used to define time-dependent sequences in a linear, readable way without introducing threads. A generator is a special kind of function that can be paused and resumed: when it executes a \textbf{yield}, control returns to the caller, but the function's local variables and execution position are preserved. On the next call, execution continues exactly where it left off.
+
+    \vspace{10pt}
+
+    This is ideal for animations in a single-threaded rendering loop. Each \textbf{yield} means “wait until the next frame before continuing”, while
+    \textbf{yield*} runs another generator as part of the sequence. The result is that complex animations can be written as straightforward step-by-step scripts, yet they still advance in perfect sync with the rendering loop and remain framerate-independent.
+
+    \vspace{10pt}
+
+    Alternative approaches like \textbf{async/await} would decouple the animation timing from the render loop, introducing unpredictability, while multithreading is not available in this environment. Generators provide a lightweight, synchronous, and deterministic solution.
+
+    \vspace{10pt}
+
+    While this syntax is not often seen or known, and may be too hard to read at first, it makes creating animation sequences in order much more straightforward. It does come with its own set of problems, like the fact that you cannot easily play two sequences at the same time, but I do provide some helper functions to make things easier.
+\end{Note}
+
+\vspace{45pt}
+
+\subsubsection{Canvas Object}
+\label{subsubsec:canvas-object}
+
+The rendering layer in this library is built around the {\footnotesize\texttt{CanvasObject}} class, which represents a drawable entity in a hierarchical scene graph. Each {\footnotesize\texttt{CanvasObject}} stores its own \textbf{position}, \textbf{scale}, \textbf{rotation}, \textbf{pivot point}\footnote{The pivot point is the point around which the object is rotated and scaled. It is usually the center of the object, but it can be set to anywhere. This is useful for animations where we want to rotate or scale the object around a specific point, like a character's feet or hands.}, and \textbf{rendering function}, and may contain child {\footnotesize\texttt{CanvasObject}} instances.
+
+\begin{Note}
+    This class is a prime example why this implementation does not follow a strict design pattern like Object-Oriented Programming (OOP). It's a data oriented design, with functional elements. The class is not meant to be extended, but rather used as a base for creating specific objects with their own rendering logic.
+\end{Note}
+
+The {\footnotesize\texttt{render}} method applies the object's local transformation to the rendering context, invokes its rendering function, and then recursively renders its children. This enables relative positioning and transformations: when a parent is moved, scaled, or rotated, its children are affected accordingly. (Local Space transformations are handled correctly and implicitly.)
+
+Rendering behavior is defined by a {\footnotesize\texttt{RenderFunction}}, which receives the object and the canvas context. This function can be supplied at construction time to customize how the object is drawn; common shapes (e.g., ellipses, rectangles) are provided in the {\footnotesize\texttt{Objects}} utility class.
+
+The system also includes optional debugging visualizations (pivot markers and bounding boxes) and a deep-copy method for duplicating objects with or without their children.
+
+This design provides three major benefits:
+\begin{itemize}
+    \item \textbf{Modularity:} Any drawable entity is just a {\footnotesize\texttt{CanvasObject}} with a specific render function.
+    \item \textbf{Hierarchical transformations:} Complex objects can be built from multiple parts with parent-child relationships.
+    \item \textbf{Flexibility:} The drawing logic is decoupled from object state, making it trivial to reuse or swap render functions.
+\end{itemize}

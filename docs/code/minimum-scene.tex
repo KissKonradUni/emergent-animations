@@ -1,40 +1,28 @@
 /* Imports */
 
 export class MinimumScene extends CanvasScene {
-    // Optional. Define the type as a record of CanvasImageTextures.
+    // Define
     override textures;   
-
-    // Optional. Define the type as a record of Renderables. 
-    // Can be nested for organization.
     override objects;   
-    
-    // Optional. Define the type as a record of SequenceObjects.
     override sequencers;
     
-    // In the constructor you receive all the necessary objects. 
-    // These are stored in protected fields, so you don't have to redefine them.
-    // The "time" reference holds the current time and delta time.
     constructor(
         wrapper: CanvasWrapper,
         context: CanvasRenderingContext2D,
         time: Readonly<Time>
     ) {
-        super(wrapper, context, time);
+        super(wrapper, context, time); // Stored as protected fields
 
-        // Initialize the textures, objects, and sequencers.
+        // Initialize
         this.textures   = {};
         this.objects    = {};
         this.sequencers = {};
     }
 
-    // The sequence method is where you define the animation logic.
-    // This a generator function, it's functionality will be explained later.
     override* sequence(): Generator<void> {
         yield* [];
     }
 
-    // The render method is where you define the rendering logic.
-    // Usually you call `this.renderInOrder([...])` to render your objects.
     override render(): void {
         return;
     }
