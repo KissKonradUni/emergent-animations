@@ -3,4 +3,50 @@
 \section{Algorithms}
 \label{sec:algorithms}
 
-\lipsum[1-3]
+\subsection{Functional animation}
+\label{subsec:functional-animation}
+
+Functional animation treats an animation as a pure function from time to state. In this example we will create a simple animation of an object following a circular path.
+
+\Example{http://kisskonraduni.github.com/emergent-animations/examples/functional-animations?tab=0}{Example can be found here}
+
+I have defined two simple functions that set the value of an object's position over time using these parameters:
+\begin{align*}
+    r &: \text{radius} & \alpha &: \text{starting angle} \\
+    t &: \text{time} & \omega &: \text{angular speed (rad/s)}
+\end{align*}
+
+Assuming our object is rotated around the origin, or if necessary offset using the object's pivot point, or a parent object, the position \(\vv{p}\) of the object at time \(t\) can be calculated as follows:
+\begin{align*}
+    x(t) &= r\cos(\alpha + \omega t) \\
+    y(t) &= r\sin(\alpha + \omega t) \\
+    \vv{p}(t) &= [x(t), y(t)]
+\end{align*}
+
+Positive \(\omega\) will rotate the object counter-clockwise, while negative \(\omega\) will rotate it clockwise. Using these simple equations, we can create a simple animation for a clearly defined path.
+
+Here is the code that implements this exact animation:
+\inputminted{typescript}{code/functional-animation.tex}
+
+While animating an object along a circular path using these equations is straightforward, this approach has significant limitations. It is difficult to construct complex or precise paths, the resulting animation lacks adaptability, and synchronizing its timing with other animations is challenging. Nevertheless, this method can be extended to address some of these issues.
+
+\begin{Note}
+    As a sidenote, this animation can also be achieved using the parenting system. Instead of setting the object's position directly, its initial position is set to the edge of the circle, and the parent object is rotated. This produces a similar animation, although the entire circle will rotate as well.
+\end{Note}
+
+\begin{table}[H]
+    \centering
+    \begin{tblr}{
+        colspec={|c|c|c|c|c|},
+        vlines = {abovepos = 1, belowpos = 1},
+        hlines,
+        hline{2} = {1}{-}{solid},
+        hline{2} = {2}{-}{solid},
+        row{1} = {font=\bfseries}
+    }
+        Deviation & Repetition & Control & Feel & Performance \\
+        \(0.0\) & \(1.0\) & Total & \(0.15\) & \(O(1)\) \\
+    \end{tblr}
+    \caption{Measurements for the functional animation algorithm.}
+    \label{tab:functional-animation-measurements}
+\end{table}

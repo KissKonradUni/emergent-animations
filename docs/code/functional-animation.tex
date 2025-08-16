@@ -1,0 +1,29 @@
+export class FunctionalAnimation extends CanvasScene { 
+    override objects = {...};
+    
+    constructor(...) {
+        // ...
+        this.objects = {
+            parent: new CanvasObject(
+                () => {},              // No render function
+                new Vector2f(350, 360) // Position (animation center)
+            ),
+            circle: new CanvasObject(
+                Objects.ellipse("red"),
+                Vector2f.zero(),       // Position (relative to parent)
+                new Vector2f(50, 50)   // Size (width, height)
+            )
+        };
+        this.objects.parent.append(this.objects.circle);
+    }
+
+    params = { radius: 200, alpha: 0, omega: 2 * Math.PI };
+
+    override render(): void {
+        this.objects.circle.position = new Vector2f(
+            this.params.radius * Math.cos(this.params.alpha + this.params.omega * this.time.now),
+            this.params.radius * Math.sin(this.params.alpha + this.params.omega * this.time.now)
+        );
+        this.objects.parent.render(this.context);
+    }
+}

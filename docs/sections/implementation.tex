@@ -79,6 +79,10 @@ In its current form, it is completely empty, but it has clear definitions. First
 The rendering layer in this library is built around the {\footnotesize\texttt{CanvasObject}} class, which represents a drawable entity in a hierarchical scene graph. Each {\footnotesize\texttt{CanvasObject}} stores its own \textbf{position}, \textbf{scale}, \textbf{rotation}, \textbf{pivot point}\footnote{The pivot point is the point around which the object is rotated and scaled. It is usually the center of the object, but it can be set to anywhere. This is useful for animations where we want to rotate or scale the object around a specific point, like a character's feet or hands.}, and \textbf{rendering function}, and may contain child {\footnotesize\texttt{CanvasObject}} instances.
 
 \begin{Note}
+    All angles/rotations in this implementation are in radians.
+\end{Note}
+
+\begin{Note}
     This class is a prime example why this implementation does not follow a strict design pattern like Object-Oriented Programming (OOP). It's a data oriented design, with functional elements. The class is not meant to be extended, but rather used as a base for creating specific objects with their own rendering logic.
 \end{Note}
 

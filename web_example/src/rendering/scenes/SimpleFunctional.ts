@@ -19,7 +19,7 @@ export class SimpleFunctional extends CanvasScene {
         this.objects = {
             xPlot: new CanvasObject(
                 Objects.plotFunction(
-                    "f(x, α, t) = cos(α + t)",
+                    "x(t) = cos(t)",
                     (x) => Math.cos(x + time.now),
                     { lower: -1, upper: 5 },
                     { lower: -2, upper: 2 },
@@ -33,7 +33,7 @@ export class SimpleFunctional extends CanvasScene {
             ),
             yPlot: new CanvasObject(
                 Objects.plotFunction(
-                    "f(y, α, t) = sin(α + t)",
+                    "y(t) = sin(t)",
                     (x) => Math.sin(x + time.now),
                     { lower: -1, upper: 5 },
                     { lower: -2, upper: 2 },
@@ -50,7 +50,7 @@ export class SimpleFunctional extends CanvasScene {
                     "transparent",
                     "#000",
                 ),
-                new Vector2f(350, 360),
+                new Vector2f(350, 350),
                 new Vector2f(400, 400),
                 new Vector2f(1, 1),
                 new Vector2f(0.5, 0.5),
@@ -61,19 +61,22 @@ export class SimpleFunctional extends CanvasScene {
                     "#ff5722",
                     "#ff8a50",
                 ),
-                new Vector2f(350, 360),
+                new Vector2f(0, 0),
                 new Vector2f(50, 50),
                 new Vector2f(1, 1),
                 new Vector2f(0.5, 0.5),
                 0,
             )
         }
+        this.objects.pathCircle.append(this.objects.circle);
     }
+
+    params = { radius: 200, alpha: 0, omega: 1 };
 
     override render(): void {
         this.objects.circle.position = new Vector2f(
-            350 + 200 * Math.cos(this.time.now),
-            360 + 200 * Math.sin(this.time.now)
+            this.params.radius * Math.cos(this.params.alpha + this.params.omega * this.time.now),
+            this.params.radius * Math.sin(this.params.alpha + this.params.omega * this.time.now)
         );
 
         this.context.lineWidth = 2;
