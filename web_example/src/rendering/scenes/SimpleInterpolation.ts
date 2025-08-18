@@ -1,5 +1,5 @@
 import { Vector2f } from "../CanvasMath.ts";
-import { CanvasObject, Objects } from "../CanvasObject.ts";
+import { CanvasObject, Objects, Renderable } from "../CanvasObject.ts";
 import { CanvasScene } from "../CanvasScene.ts";
 import { CanvasWrapper } from "../CanvasWrapper.ts";
 import { Time } from "../Time.ts";
@@ -113,27 +113,27 @@ export class SimpleInterpolation extends CanvasScene {
         this.sequencers = {
             ballAInterpolator: new Interpolator(
                 time,
-                (t: number) => { this.objects.ballA.position.y = t },
+                (v: number) => { this.objects.ballA.position.y = v },
                 {
                     startValue: 360,
                     endValue: 600,
                     duration: 1,
-                    easing: (t) => t * t,
+                    easing: Easings.easeInQuad,
                 }
             ),
             ballBInterpolator: new Interpolator(
                 time,
-                (t: number) => { this.objects.ballB.position.y = t },
+                (v: number) => { this.objects.ballB.position.y = v },
                 {
                     startValue: 360,
                     endValue: 600,
                     duration: 1,
-                    easing: (t) => 1 - Math.pow(1 - t, 2),
+                    easing: Easings.easeOutQuad,
                 }
             ),
             ballCInterpolator: new Interpolator(
                 time,
-                (t: number) => { this.objects.ballC.position.y = t },
+                (v: number) => { this.objects.ballC.position.y = v },
                 {
                     startValue: 360,
                     endValue: 600,
@@ -177,12 +177,14 @@ export class SimpleInterpolation extends CanvasScene {
 
         this.context.lineWidth = 1;
 
+        // Update the plots
         this.dotPositions.ballA = this.sequencers.ballAInterpolator.progress;
         this.dotPositions.ballB = this.sequencers.ballBInterpolator.progress;
         this.dotPositions.ballC = this.sequencers.ballCInterpolator.progress;
 
-        Object.keys(this.objects).forEach((key) => {
-            this.objects[key as keyof typeof this.objects].render(this.context);
-        });
+        // Render the objects
+        this.renderInOrder(
+            ...Object.values(this.objects) // Shorthand for rendering all objects
+        );
     }
 }

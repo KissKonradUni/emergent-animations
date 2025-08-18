@@ -10,13 +10,9 @@ There are some major measurement methods that I will use to evaluate the results
 
 Deviation (\(\bar{D}\)), as defined by me in these measurements, is a measure of how much the actual motion deviates from the expected or desired motion. It can be quantified by calculating the difference between the actual position of an animated object and its expected position at a given time. 
 
-I will define \(1\) as the maximum deviation, where the motion has no correlation with the expected motion, and \(0\) as the minimum deviation, where the motion is the exact same as the expected motion.
+I will define \(1\) as the maximum deviation, where the motion has no correlation with the expected motion, and \(0\) as the minimum deviation, where the motion is the exact same as the expected motion. I will not provide an exact formula here, as it will depend on the specific use case.
 
-I will not provide an exact formula here, as it will depend on the specific use case.
-
-The expected position will usually be a linear interpolation between two keyframes, while the actual position will be determined by the algorithm used to generate the motion. This means that easing functions, procedural noise and any other factors that affect the motion will be taken into account.
-
-This statistic may be a bit biased towards stiff, robotic motions, as they will have a lower deviation from the expected motion. However, it is still a useful metric to evaluate the overall smoothness and naturalness of the motion. There will be a lot of techniques where this will be omitted entirely, because the motion is purely procedural and we cannot define an expected motion. In these cases, we will state that the deviation metric is \(1\).
+The expected position will usually be a linear interpolation between two keyframes, while the actual position will be determined by the algorithm used to generate the motion. This means that easing functions, procedural noise and any other factors that affect the motion will be taken into account. This statistic may be a bit biased towards stiff, robotic motions, as they will have a lower deviation from the expected motion. However, it is still a useful metric to evaluate the overall smoothness and naturalness of the motion.
 
 \subsection{Repetition}
 \label{subsec:repetition}

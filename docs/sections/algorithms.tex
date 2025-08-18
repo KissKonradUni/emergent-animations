@@ -8,7 +8,7 @@
 
 Functional animation treats an animation as a pure function from time to state. In this example we will create a simple animation of an object following a circular path.
 
-\Example{http://kisskonraduni.github.com/emergent-animations/examples/functional-animations?tab=0}{Example can be found here}
+\Example{https://kisskonraduni.github.io/emergent-animations/examples/functional-animations?tab=0}{Example can be found here}
 
 I have defined two simple functions that set the value of an object's position over time using these parameters:
 \begin{align*}
@@ -50,3 +50,75 @@ While animating an object along a circular path using these equations is straigh
     \caption{Measurements for the functional animation algorithm.}
     \label{tab:functional-animation-measurements}
 \end{table}
+
+\vspace{80pt}
+
+\subsection{Interpolation based animation}
+\label{subsec:interpolation-animation}
+
+A more advanced and widely used approach in animation is keyframe interpolation\footnote{
+    Interpolation is a method of constructing new data points within the range of a discrete set of known data points. In animation, it is used to create smooth transitions between keyframes by calculating intermediate frames based on the defined keyframes.
+}. In this method, the start and end values of the animation, as well as its duration, are defined. A simple equation then calculates the object's position at any given time. These animations can be started, stopped, and reversed at any time, and will always produce the same result for identical input parameters. This predictability makes them easy to control.
+
+\pagebreak
+
+The basic equation for \textbf{linear} interpolation is:
+\begin{align*}
+    a&: \text{start value} & t_0&: \text{start time} \\
+    b&: \text{end value}   & t_1&: \text{end time}   \\
+    r(t)&: \text{result}      & t  &: \text{current time}
+\end{align*}
+\begin{align*}
+    \Delta t &= t_1 - t_0 \\
+    r(t) &= a + (b - a) \cdot \frac{t - t_0}{\Delta t}
+\end{align*}
+
+This equation produces a smooth transition from \(a\) to \(b\) over the interval \([t_0, t_1]\). It should be evaluated once per frame.
+
+\begin{Note}
+    In my implementation, I have created a simple \textbf{Interpolator} class that handles the interpolation for you. It takes care of the timing and the calculation of the result, so you can just use it to get the current value of the animation. Also, you just have to start it in the \textbf{sequence} generator function, and it will automatically update the value every frame.
+\end{Note}
+
+A common question arises: how can we make the animation appear less mechanical? This can be achieved by using \textbf{easing functions}, which modify the timing of linear interpolations to create more natural motion. Easing functions can introduce acceleration, deceleration, and other effects that make the animation feel more fluid.
+
+\begin{Note}
+    I have implemented a simple \textbf{Easing} class that provides a set of common easing functions, like \textbf{ease-in}, \textbf{ease-out}, and \textbf{ease-in-out}. The basic syntax is really simple, so you can define your own easing functions easily. There are some basic rules to follow when creating valid easing functions: the function should take a value between \(0\) and \(1\) as input, and return \(0\) at \(0\) and \(1\) at \(1\). An excellent resource for common easing functions is \cite{easings}.
+\end{Note}
+
+The correct method to integrate easing functions into the interpolation is as follows:
+\begin{align*}
+    \epsilon(t)&: \text{easing function} \\
+    t &: \text{current time} \\
+    \\
+    r(t) &= a + (b - a) \cdot \epsilon\left(\frac{t - t_0}{\Delta t}\right)
+\end{align*}
+
+\Example{https://kisskonraduni.github.io/emergent-animations/examples/functional-animations?tab=1}{Example can be found here}
+
+\pagebreak
+
+Interpolation-based animation is one of the most widely used methods in computer graphics and user interface design. It is straightforward to implement, offers precise control, and produces smooth transitions. This technique forms the foundation of most animation software, game engines, and even simple UI frameworks. Furthermore, it serves as the basis for many advanced animation techniques.
+
+\begin{table}[H]
+    \centering
+    \begin{tblr}{
+        colspec={|c|c|c|c|c|},
+        vlines = {abovepos = 1, belowpos = 1},
+        hlines,
+        hline{2} = {1}{-}{solid},
+        hline{2} = {2}{-}{solid},
+        row{1} = {font=\bfseries}
+    }
+        Deviation & Repetition & Control & Feel & Performance \\
+        \text{Defined below} & \(1.0\) & High & \(0.8\) & \(O(1)\) \\
+    \end{tblr}
+    \caption{Measurements for the interpolation based animation algorithm.}
+    \label{tab:interpolation-animation-measurements}
+\end{table}
+
+The deviation for this algorithm is defined as the integral of the absolute difference between the linear function and the chosen easing function:
+\begin{align*}
+    l(t) = t &: \text{linear function} \\
+    \epsilon(t) &: \text{easing function} \\
+    \bar{D} &= \int_{t=0}^{1} \left| l(t) - \epsilon(t) \right| dt
+\end{align*}
