@@ -1,5 +1,5 @@
 import { Vector2f } from "../CanvasMath.ts";
-import { CanvasObject, Objects, Renderable } from "../CanvasObject.ts";
+import { CanvasObject, Objects } from "../CanvasObject.ts";
 import { CanvasScene } from "../CanvasScene.ts";
 import { CanvasWrapper } from "../CanvasWrapper.ts";
 import { Time } from "../Time.ts";

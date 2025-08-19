@@ -1,7 +1,9 @@
 <script lang="ts">
+    import { tick } from "svelte";
     import { Navigate } from "../Router";
 
     let { href, style = "", cssClass = "", target = "", rel = "", children } = $props();
+    let element: HTMLAnchorElement;
 
     function onclick(event: MouseEvent) {
         if (target !== "")
@@ -12,9 +14,14 @@
 
         Navigate(href);
     }
+
+    // Trim whitespace from the link text after rendering
+    tick().then(() => {
+        element.innerText = element.innerText.trim();
+    });
 </script>
 
-<a {href} {style} {target} {rel} class="link {cssClass}" {onclick}>
+<a {href} {style} {target} {rel} class="link {cssClass}" {onclick} bind:this={element}>
     {@render children?.()}
     {#if !children}
         {href}
