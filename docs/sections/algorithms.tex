@@ -122,3 +122,25 @@ The deviation for this algorithm is defined as the integral of the absolute diff
     \epsilon(t) &: \text{easing function} \\
     \bar{D} &= \int_{t=0}^{1} \left| l(t) - \epsilon(t) \right| dt
 \end{align*}
+
+\vspace{60pt}
+
+\subsubsection{Timelines and sequencing}
+\label{subsubsec:timelines-sequencing}
+
+Many practical animations are compositions of multiple steps rather than a single, fixed-duration function. Timelines and sequencing provide a simple abstraction for assembling such compositions.
+
+A \textbf{timeline} is an ordered collection of animations (or sequences) that are played one after another. Timelines may themselves be composed and can be executed in parallel with other timelines so that multiple objects are animated independently. A \textbf{sequence} is a single animation described by a set of keyframes or an interpolation procedure; it represents one contiguous part of a timeline.
+
+\begin{Note}
+    In this implementation, each timeline is represented as a generator function, following the same pattern as the \textbf{sequence} generator. To run multiple timelines concurrently, you create separate generator functions for each timeline and pass their generator instances to a parallel runner. For example, you can yield the parallel helper (represented here as {\footnotesize\texttt{Animator.runParallel(...)}}) from the main \textbf{sequence} generator to execute multiple timelines at the same time.
+\end{Note}
+
+\pagebreak
+
+\begin{Note}
+    When defining sequences within a timeline, the provided \textbf{InterpolationSequence} class uses a per-keyframe \textbf{duration} convention: each keyframe specifies the time interval from the previous keyframe to itself, rather than an absolute timestamp. This approach streamlines both implementation and editing, as you directly control the duration of each segment. However, it differs from traditional absolute-time timelines, where each keyframe has a specific time value. If needed, you can easily convert between these representations: cumulative sums of durations yield absolute times, while differences between absolute times yield per-segment durations. This system was chosen for its simplicity and efficiency, but it remains flexible enough to support absolute-time timelines if required.
+\end{Note}
+
+\Example{https://kisskonraduni.github.io/emergent-animations/examples/functional-animations?tab=2}{An example sequence can be found here}
+\Example{https://kisskonraduni.github.io/emergent-animations/examples/functional-animations?tab=3}{and a more complex example can be found here}
