@@ -144,3 +144,45 @@ A \textbf{timeline} is an ordered collection of animations (or sequences) that a
 
 \Example{https://kisskonraduni.github.io/emergent-animations/examples/functional-animations?tab=2}{An example sequence can be found here}
 \Example{https://kisskonraduni.github.io/emergent-animations/examples/functional-animations?tab=3}{and a more complex example can be found here}
+
+\vspace{60pt}
+
+\subsection{Frame animations}
+\label{subsec:frame-animations}
+
+Frame animations are a common technique in computer graphics, particularly in 2D animation. They're based on the original concepts of filmmaking, where a series of still images are displayed in rapid succession to create the illusion of motion. In computer graphics, this is often implemented as a sequence of images or frames that are displayed one after another. Compression algorithms, sprite sheets, and similar techniques may cause the implementation to differ slightly, but the basic principle remains the same.
+
+\begin{Note}
+    In this implementation, I utilize spritesheets to store the frames of the animation, and a function to control which frame is shown at any given time. To use this, you need to define a regular \textbf{CanvasObject} and use the {\footnotesize\texttt{Objects.sprite(...)}} drawing function.
+\end{Note}
+
+\Example{https://kisskonraduni.github.io/emergent-animations/examples/frame-animations?tab=0}{An example frame animation can be found here}
+
+\pagebreak
+
+While frame animations are simple in concept, they can be combined with other techniques to create more complex results. For example, you can use frame animations to create a character that moves around the screen, while using interpolation to control the speed and direction of movement. This allows for a wide range of possibilities and can lead to interesting results.
+
+I have created an example\footnote{
+    This is not intended as a serious example; I created it while experimenting with the implementation. Surprisingly, it demonstrates how frame animations can be combined with other techniques, such as interpolation and parenting, to create more complex animations. It also shows how the implementation can be used to create animations with minimal effort.
+} to show that these techniques are not mutually exclusive, and can be combined to create more complex animations. The example is a simple "pendulum" with three cats, each using its own frame animation.
+
+\Example{https://kisskonraduni.github.io/emergent-animations/examples/frame-animations?tab=1}{Example can be found here}
+
+\begin{table}[H]
+    \centering
+    \begin{tblr}{
+        colspec={|c|c|c|c|c|},
+        vlines = {abovepos = 1, belowpos = 1},
+        hlines,
+        hline{2} = {1}{-}{solid},
+        hline{2} = {2}{-}{solid},
+        row{1} = {font=\bfseries}
+    }
+        Deviation & Repetition & Control & Feel & Performance \\
+        \(0.0\) & \(1.0\) & Total & \(N/A\) & \(O(1)\) \\
+    \end{tblr}
+    \caption{Measurements for the frame animation algorithm.}
+    \label{tab:frame-animation-measurements}
+\end{table}
+
+The reason for omitting the feel measurement is that frame animations are not inherently tied to any specific timing or easing function. They simply display a sequence of images at a fixed rate, which can be adjusted independently of the animation itself. The feel of the animation is determined by the choice of frames and their timing, rather than the algorithm itself.

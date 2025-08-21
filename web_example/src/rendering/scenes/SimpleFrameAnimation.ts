@@ -20,7 +20,7 @@ export class SimpleFrameAnimation extends CanvasScene {
 
         this.objects = {
             cat: new CanvasObject(
-                Objects.sprite(this.textures.cat as CanvasSpritesheet, () => Math.floor(time.now * 24)),
+                Objects.sprite(this.textures.cat, () => Math.floor(time.now * 24)),
                 new Vector2f(1280 / 2, 720 / 2),
                 new Vector2f(256, 256),
             ),

@@ -34,7 +34,7 @@ export class CatPendulum extends CanvasScene {
         super(wrapper, context, time);
         this.objects = { 
             cat1: new CanvasObject(
-                Objects.sprite(this.textures.cat1 as CanvasSpritesheet, () => Math.floor(time.now * 24)),
+                Objects.sprite(this.textures.cat1, () => Math.floor(time.now * 24)),
                 new Vector2f(0, 200),
                 new Vector2f(200, 200),
                 new Vector2f(1.0, 1.0),
@@ -42,7 +42,7 @@ export class CatPendulum extends CanvasScene {
                 0
             ),
             cat2: new CanvasObject(
-                Objects.sprite(this.textures.cat2 as CanvasSpritesheet, () => Math.floor(time.now * 24)),
+                Objects.sprite(this.textures.cat2, () => Math.floor(time.now * 24)),
                 new Vector2f(0, 150),
                 new Vector2f(200, 200),
                 new Vector2f(1.0, 1.0),
@@ -50,7 +50,7 @@ export class CatPendulum extends CanvasScene {
                 0
             ),
             cat3: new CanvasObject(
-                Objects.sprite(this.textures.cat3 as CanvasSpritesheet, () => Math.floor(time.now * 24)),
+                Objects.sprite(this.textures.cat3, () => Math.floor(time.now * 24)),
                 new Vector2f(640, 100),
                 new Vector2f(200, 150),
                 new Vector2f(1.0, 1.0),
