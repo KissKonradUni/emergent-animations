@@ -13,26 +13,24 @@ export class SimpleSequence extends CanvasScene {
     }
 
     override sequencers: {
-        sequenceAX: InterpolationSequence;
-        sequenceAY: InterpolationSequence;
-        sequenceBX: InterpolationSequence;
-        sequenceBY: InterpolationSequence;
+        sequenceA: InterpolationSequence<Vector2f>;
+        sequenceB: InterpolationSequence<Vector2f>;
     }
 
     rectPath = [
-        new Vector2f(160, 160),
-        new Vector2f(560, 160),
-        new Vector2f(560, 560),
-        new Vector2f(160, 560),
+        {value: new Vector2f(160, 160), duration: 0.25},
+        {value: new Vector2f(560, 160), duration: 0.25},
+        {value: new Vector2f(560, 560), duration: 0.25},
+        {value: new Vector2f(160, 560), duration: 0.25},
     ];
 
     polyPath = [
-        new Vector2f(720 , 260),
-        new Vector2f(920 , 160),
-        new Vector2f(1120, 260),
-        new Vector2f(720 , 460),
-        new Vector2f(920 , 560),
-        new Vector2f(1120, 460),
+        {value: new Vector2f(720 , 260), duration: 0.33},
+        {value: new Vector2f(920 , 160), duration: 0.33},
+        {value: new Vector2f(1120, 260), duration: 0.33},
+        {value: new Vector2f(720 , 460), duration: 0.33},
+        {value: new Vector2f(920 , 560), duration: 0.33},
+        {value: new Vector2f(1120, 460), duration: 0.33},
     ]
     
     constructor(wrapper: CanvasWrapper, context: CanvasRenderingContext2D, time: Readonly<Time>) {
@@ -63,42 +61,20 @@ export class SimpleSequence extends CanvasScene {
         };
 
         this.sequencers = {
-            sequenceAX: new InterpolationSequence(
+            sequenceA: new InterpolationSequence<Vector2f>(
                 this.time,
-                (value) => this.objects.circleA.position.x = value,
-                this.rectPath.map(p => p.x),
+                (value) => this.objects.circleA.position = value,
                 {
-                    duration: 0.75,
+                    keyframes: this.rectPath,
                     easing: Easings.linear,
                     loops: true
                 }
             ),
-            sequenceAY: new InterpolationSequence(
+            sequenceB: new InterpolationSequence<Vector2f>(
                 this.time,
-                (value) => this.objects.circleA.position.y = value,
-                this.rectPath.map(p => p.y),
+                (value) => this.objects.circleB.position = value,
                 {
-                    duration: 0.75,
-                    easing: Easings.linear,
-                    loops: true
-                }
-            ),
-            sequenceBX: new InterpolationSequence(
-                this.time,
-                (value) => this.objects.circleB.position.x = value,
-                this.polyPath.map(p => p.x),
-                {
-                    duration: 0.5,
-                    easing: Easings.easeInOutCubic,
-                    loops: true
-                }
-            ),
-            sequenceBY: new InterpolationSequence(
-                this.time,
-                (value) => this.objects.circleB.position.y = value,
-                this.polyPath.map(p => p.y),
-                {
-                    duration: 0.5,
+                    keyframes: this.polyPath,
                     easing: Easings.easeInOutCubic,
                     loops: true
                 }
@@ -109,9 +85,9 @@ export class SimpleSequence extends CanvasScene {
     public override render(): void {
         // Render a custom polygon path
         this.context.beginPath();
-        this.context.moveTo(this.polyPath[0].x, this.polyPath[0].y);
+        this.context.moveTo(this.polyPath[0].value.x, this.polyPath[0].value.y);
         for (let i = 1; i < this.polyPath.length; i++) {
-            this.context.lineTo(this.polyPath[i].x, this.polyPath[i].y);
+            this.context.lineTo(this.polyPath[i].value.x, this.polyPath[i].value.y);
         }
         this.context.closePath();
 
@@ -127,13 +103,19 @@ export class SimpleSequence extends CanvasScene {
     }
 
     public override* sequence(): Generator<void> {
-        while (true) {
-            yield* Animator.runTogether([
-                this.sequencers.sequenceAX,
-                this.sequencers.sequenceAY,
-                this.sequencers.sequenceBX,
-                this.sequencers.sequenceBY,
-            ]);
-        }
+        yield* Animator.runParallel([
+            this.sequenceA(),
+            this.sequenceB()
+        ]);
+    }
+
+    public* sequenceA(): Generator<void> {
+        while (true)
+            yield* Animator.run(this.sequencers.sequenceA);
+    }
+
+    public* sequenceB(): Generator<void> {
+        while (true)
+            yield* Animator.run(this.sequencers.sequenceB);
     }
 }

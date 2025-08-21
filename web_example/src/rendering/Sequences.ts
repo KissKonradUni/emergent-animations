@@ -1,3 +1,4 @@
+import { Vector2f } from "./CanvasMath.ts";
 import { Time } from "./Time.ts";
 
 /**
@@ -49,6 +50,26 @@ export class Animator {
             finished = runners.map((runner) => runner.tick());
             yield;
         } while (finished.some(done => !done));
+    }
+
+    /**
+     * Runs multiple sequences in parallel until all are finished.
+     * This allows them to have concurrent/separate timelines.
+     * @param sequences An array of sequence generators to run in parallel.
+     */
+    public static* runParallel(sequences: Array<Generator<void>>): Generator<void> {
+        let done = false;
+        while (!done) {
+            done = true;
+            for (const sequence of sequences) {
+                const result = sequence.next();
+                if (!result.done) {
+                    done = false;
+                }
+            }
+            yield;
+        }
+        return;
     }
 }
 
@@ -102,25 +123,34 @@ export type EasingFunction = (t: number) => number;
  * @property duration - The total time in seconds for the interpolation to complete.
  * @property easing - An optional easing function to modify the interpolation curve.
  */
-interface InterpolatorOptions {
-    startValue: number;
-    endValue: number;
+interface InterpolatorOptions<T> {
+    startValue: T;
+    endValue: T;
     duration: number;
     easing?: EasingFunction;
+}
+
+type InterpolatorImplementations = number | Vector2f;
+
+enum InterpolatorType {
+    Number = "number",
+    Vector2f = "vector2f"
 }
 
 /**
  * Interpolator class that animates a value from a start value to an end value over a specified duration.
  */
-export class Interpolator extends SequenceObject {
-    private setter: (value: number) => void;
+export class Interpolator<T extends InterpolatorImplementations = number> extends SequenceObject {
+    private setter: (value: T) => void;
     
-    public options: InterpolatorOptions;
+    public options: InterpolatorOptions<T>;
 
     private startTime: number = 0;
     private endTime: number = 0;
 
     private finished: boolean = true;
+
+    private type: InterpolatorType;
     
     /**
      * Creates an interpolator that can be used to animate a value over time.
@@ -128,11 +158,25 @@ export class Interpolator extends SequenceObject {
      * @param setter The function used to set the value of the interpolated property.
      * @param options Additional parameters to configure the interpolator.
      */
-    constructor(time: Readonly<Time>, setter: (value: number) => void, options: InterpolatorOptions) {
+    constructor(time: Readonly<Time>, setter: (value: T) => void, options: InterpolatorOptions<T>) {
         super(time);
         this.setter = setter;
         this.options = options;
         this.options.easing = options.easing ?? ((t) => t);
+
+        switch (typeof options.startValue) {
+            case "number":
+                this.type = InterpolatorType.Number;
+                break;
+            case "object":
+                if (options.startValue instanceof Vector2f)
+                    this.type = InterpolatorType.Vector2f;
+                else 
+                    throw new Error("Unsupported type for Interpolator: " + typeof options.startValue);
+                break;
+            default:
+                throw new Error("Unsupported type for Interpolator: " + typeof options.startValue);
+        }
     }
 
     public override start(): void {
@@ -151,7 +195,24 @@ export class Interpolator extends SequenceObject {
         const elapsed = currentTime - this.startTime;
         const t = Math.min(elapsed / this.options.duration, 1);
         const easedValue = this.options.easing!(t);
-        const interpolatedValue = this.options.startValue + (this.options.endValue - this.options.startValue) * easedValue;
+        let interpolatedValue: T;
+        switch (this.type) {
+            case InterpolatorType.Number:
+                interpolatedValue = Interpolator.lerp(this.options.startValue as number, this.options.endValue as number, easedValue) as T;
+                break;
+            case InterpolatorType.Vector2f:
+                interpolatedValue = new Vector2f(0, 0) as T;
+                Interpolator.lerpVector2fInPlace(
+                    interpolatedValue as Vector2f,
+                    this.options.startValue as Vector2f,
+                    this.options.endValue as Vector2f,
+                    easedValue
+                );
+                break;
+            default:
+                interpolatedValue = this.options.startValue; // Fallback, should not happen
+                break;
+        }
 
         this.setter(interpolatedValue);
 
@@ -177,6 +238,15 @@ export class Interpolator extends SequenceObject {
         
         this.options.startValue = this.options.endValue;
         this.options.endValue = temp;
+    }
+
+    private static lerp(a: number, b: number, t: number): number {
+        return a + (b - a) * t;
+    }
+
+    private static lerpVector2fInPlace(r: Vector2f, a: Vector2f, b: Vector2f, t: number): void {
+        r.x = this.lerp(a.x, b.x, t);
+        r.y = this.lerp(a.y, b.y, t);
     }
 }
 
@@ -249,40 +319,46 @@ export class Easings {
     }
 }
 
-interface SequenceOptions {
+interface Keyframe<T extends InterpolatorImplementations = number> {
+    value: Readonly<T>;
     duration: number;
+}
+
+interface SequenceOptions<T extends InterpolatorImplementations = number> {
+    keyframes: Array<Keyframe<T>>;
     easing?: EasingFunction;
     loops?: boolean;
 }
 
-export class InterpolationSequence extends SequenceObject {
-    public values: Array<number>;
+export class InterpolationSequence<T extends InterpolatorImplementations = number> extends SequenceObject {
     private currentIndex: number = 0;
-    private interpolator: Interpolator;
+    private interpolator: Interpolator<T>;
     private endsOnStart: boolean;
+    private frames: Array<Keyframe<T>>;
 
-    constructor(time: Readonly<Time>, setter: (value: number) => void, values: Array<number>, interpolatorOptions: SequenceOptions) {
+    constructor(time: Readonly<Time>, setter: (value: T) => void, sequenceOptions: SequenceOptions<T>) {
         super(time);
-        this.values = values;
-        this.interpolator = new Interpolator(time, setter, {
-            startValue: values[0],
-            endValue: values[1],
-            duration: interpolatorOptions.duration,
-            easing: interpolatorOptions.easing,
+        
+        this.frames = sequenceOptions.keyframes;
+        this.interpolator = new Interpolator<T>(time, setter, {
+            startValue: this.frames[0].value,
+            endValue:   this.frames[1].value,
+            duration:   this.frames[0].duration ?? 1,
+            easing:     sequenceOptions.easing,
         });
-        this.endsOnStart = interpolatorOptions.loops ?? false;
+        this.endsOnStart = sequenceOptions.loops ?? false;
     }
 
     public override start(): void {
         this.interpolator.start();
         this.currentIndex = 0;
-        this.interpolator.options.startValue = this.values[0];
-        this.interpolator.options.endValue = this.values[1];
+        this.interpolator.options.startValue = this.frames[0].value;
+        this.interpolator.options.endValue   = this.frames[1].value;
     }
 
     public override tick(): boolean {
         // If the current index is out of bounds, the sequence is finished
-        if (this.currentIndex >= this.values.length - (this.endsOnStart ? 0 : 1)) {
+        if (this.currentIndex >= this.frames.length - (this.endsOnStart ? 0 : 1)) {
             return true;
         }
 
@@ -291,9 +367,9 @@ export class InterpolationSequence extends SequenceObject {
             this.currentIndex++;
 
             // If there are more values to interpolate, set the next start and end values
-            if (this.currentIndex < this.values.length) {
-                this.interpolator.options.startValue = this.values[this.currentIndex];
-                this.interpolator.options.endValue = this.values[(this.currentIndex + 1) % this.values.length];
+            if (this.currentIndex < this.frames.length) {
+                this.interpolator.options.startValue = this.frames[this.currentIndex].value;
+                this.interpolator.options.endValue = this.frames[(this.currentIndex + 1) % this.frames.length].value;
                 this.interpolator.start(); 
             }
         }

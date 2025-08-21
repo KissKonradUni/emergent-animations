@@ -102,12 +102,16 @@ export class ComplexSequence extends CanvasScene {
                 this.time,
                 0.5
             ),
-            signRotation: new InterpolationSequence(
+            signRotation: new InterpolationSequence<number>(
                 this.time,
                 (value) => this.objects.sign.rotation = value,
-                [0, -0.05, 0.05, 0],
                 {
-                    duration: 0.25,
+                    keyframes: [
+                        {value:  0.00, duration: 0.25},
+                        {value: -0.05, duration: 0.25},
+                        {value:  0.05, duration: 0.25},
+                        {value:  0.00, duration: 0.25},
+                    ],
                     easing: Easings.easeInOutQuad
                 }
             ),
@@ -121,15 +125,18 @@ export class ComplexSequence extends CanvasScene {
                     easing: Easings.easeOutElastic,
                 }
             ),
-            pivotRotationStart: new InterpolationSequence(
+            pivotRotationStart: new InterpolationSequence<number>(
                 this.time,
                 (value) => {
                     this.objects.pivot.rotation = value;
                     this.objects.nail.rotation = -value + 0.2;
                 },
-                [Math.PI / 5, -Math.PI / 5, Math.PI / 10],
                 {
-                    duration: 0.6666,
+                    keyframes: [
+                        {value:  Math.PI / 5 , duration: 0.66},
+                        {value: -Math.PI / 5 , duration: 0.66},
+                        {value:  Math.PI / 10, duration: 0.66},
+                    ],
                     easing: Easings.easeInOutQuad
                 }
             ),
