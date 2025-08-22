@@ -125,8 +125,8 @@ The deviation for this algorithm is defined as the integral of the absolute diff
 
 \vspace{60pt}
 
-\subsubsection{Timelines and sequencing}
-\label{subsubsec:timelines-sequencing}
+\subsection{Timelines and sequencing}
+\label{subsec:timelines-sequencing}
 
 Many practical animations are compositions of multiple steps rather than a single, fixed-duration function. Timelines and sequencing provide a simple abstraction for assembling such compositions.
 
@@ -186,3 +186,68 @@ I have created an example\footnote{
 \end{table}
 
 The reason for omitting the feel measurement is that frame animations are not inherently tied to any specific timing or easing function. They simply display a sequence of images at a fixed rate, which can be adjusted independently of the animation itself. The feel of the animation is determined by the choice of frames and their timing, rather than the algorithm itself.
+
+\vspace{30pt}
+
+\subsection{Double buffering}
+\label{subsec:double-buffering}
+
+Double buffering is a technique used to reduce flickering and improve animation smoothness. It uses two buffers: while one is displayed, the other is drawn to in the background. When drawing is complete, the buffers are swapped, showing the new frame.
+
+Although not strictly an animation technique, double buffering is often used alongside other methods to improve quality, especially for complex or slow rendering. This section serves as a segue, since many upcoming techniques rely on double buffering.
+
+\begin{Note}
+    Double buffering can be applied to data beyond images, such as simulation states or object positions in physics engines. Without it, execution order can cause inconsistencies. It also enables some multithreading, though this project does not use it due to language constraints.
+\end{Note}
+
+\pagebreak
+
+\subsection{Rule-based animation systems}
+\label{subsec:rule-based-animation-systems}
+
+Rule-based animation systems use a set of predefined rules to determine how an object should move or change over time. These rules can be based on various factors, such as the object's current state, its environment, or user input. Rule-based systems are often used in games and simulations to create more dynamic and responsive animations.
+
+A simple example is a basic implementation of Conway's Game of Life \cite{conway}. Each cell in a grid can be either alive or dead, and its state is determined by a set of rules based on the states of its neighboring cells.
+
+\Example{https://kisskonraduni.github.io/emergent-animations/examples/rule-based-animations?tab=0}{My implementation can be found here}
+
+This serves as a demonstration of how rule-based systems can be implemented and used to create interesting animations. It is not intended for direct comparison with the other algorithms, but rather to illustrate the fundamental concepts.
+
+\subsection{Boids}
+\label{subsec:boids}
+
+Boids is a popular algorithm for simulating the flocking behavior of birds or fish. It was developed by Craig Reynolds in 1986 \cite{boids} and is based on three simple rules:
+\begin{enumerate}
+    \item \textbf{Separation}: steer to avoid crowding local flockmates
+    \item \textbf{Alignment}: steer towards the average heading of local flockmates
+    \item \textbf{Cohesion}: steer to move toward the average position of local flockmates
+\end{enumerate}
+
+Each boid (bird-like object) in the simulation follows these rules to determine its movement. The result is realistic flocking behavior that emerges from the simple interactions of individual boids.
+
+\begin{Note}
+    I have made some modifications to the original algorithm, including an extra rule to steer away from the edges of the screen, and the strength of most rules varies cubically with distance. The core concepts remain the same, and the result is similar to the original algorithm, but it is adapted to my preferences.
+\end{Note}
+
+\Example{https://kisskonraduni.github.io/emergent-animations/examples/rule-based-animations?tab=1}{My implementation can be found here}
+
+There are many parameters that can be adjusted to change the behavior of the flock. In my implementation, these controls are available in the bottom right corner of the interface. Some combinations of parameters may slow down the simulation significantly, as the algorithm is originally \(O(n^2)\) in complexity. Although I have implemented optimizations using a spatial grid \cite{spatial-grid}, it is still not efficient for very large numbers of boids.
+
+\begin{table}[H]
+    \centering
+    \begin{tblr}{
+        colspec={|c|c|c|c|c|},
+        vlines = {abovepos = 1, belowpos = 1},
+        hlines,
+        hline{2} = {1}{-}{solid},
+        hline{2} = {2}{-}{solid},
+        row{1} = {font=\bfseries}
+    }
+        Deviation & Repetition & Control & Feel & Performance \\
+        \(N/A\) & \(0.2\) & Medium & \(0.9\) & \(O(n^2)\) \\
+    \end{tblr}
+    \caption{Measurements for the boids algorithm.}
+    \label{tab:boids-measurements}
+\end{table}
+
+The deviation metric is not defined for this algorithm, as it is not deterministic. The performance is also not strictly \(O(n^2)\) due to the spatial grid optimization; in theory, the best case achievable is \(O(n \log n)\).
