@@ -14,7 +14,28 @@ export class CanvasObject implements Renderable {
     public static debugMode: boolean = false;
 
     public position: Vector2f;
+    public get globalPosition(): Vector2f {
+        if (this._parent === null)
+            return this.position.clone();
+        
+        const parentGlobalPos = this._parent.globalPosition;
+        const sin = Math.sin(this._parent.rotation);
+        const cos = Math.cos(this._parent.rotation);
+        const rotatedX = this.position.x * cos - this.position.y * sin;
+        const rotatedY = this.position.x * sin + this.position.y * cos;
+        return new Vector2f(
+            parentGlobalPos.x + rotatedX * this._parent.scale.x,
+            parentGlobalPos.y + rotatedY * this._parent.scale.y,
+        );
+    }
+    
     public rotation: number;
+    public get globalRotation(): number {
+        if (this._parent === null)
+            return this.rotation;
+        return this.rotation + this._parent.globalRotation;
+    }
+
     private _size: Vector2f;
     public get size(): Vector2f {
         return this._size;
@@ -29,6 +50,9 @@ export class CanvasObject implements Renderable {
     protected renderFunction: RenderFunction;
 
     protected _parent: CanvasObject | null = null;
+    public get parent(): CanvasObject | null {
+        return this._parent;
+    }
     private _children: CanvasObject[];
     public append(...children: CanvasObject[]): void {
         this._children.push(...children);

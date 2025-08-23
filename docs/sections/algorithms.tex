@@ -145,6 +145,28 @@ A \textbf{timeline} is an ordered collection of animations (or sequences) that a
 \Example{https://kisskonraduni.github.io/emergent-animations/examples/functional-animations?tab=2}{An example sequence can be found here}
 \Example{https://kisskonraduni.github.io/emergent-animations/examples/functional-animations?tab=3}{and a more complex example can be found here}
 
+\vspace{90pt}
+
+\subsection{Data-driven animations}
+\label{subsec:data-driven-animations}
+
+There are animation techniques that rely on pre-recorded data rather than procedural generation. These methods can produce highly realistic results, as they are based on real-world motion capture or other data sources. However, they also have limitations, such as the need for large amounts of data and the difficulty of adapting the animation to different contexts.
+
+A commonly used data-driven technique is motion capture, where the movements of a real person or animal are recorded and then applied to a digital character. This can produce highly realistic animations, but it requires specialized equipment and can be time-consuming and expensive. If the actor's size or proportions differ significantly from the digital character, the animation may look unnatural and may require a lot of manual adjustment.
+
+\pagebreak
+
+\subsection{Blend trees and directional blending}
+\label{subsec:blend-trees-directional-blending}
+
+Blend trees and directional blending are techniques used to combine multiple animations based on certain parameters, such as the direction of movement or the speed of an object. These methods allow for smooth transitions between different animations, creating a more natural and fluid motion.
+
+These techniques are commonly used in video games and simulations, where we cannot predict the exact movements of the player or other objects. By blending between different animations based on the current state of the object, we can create a more dynamic and responsive animation system.
+
+A common example of directional blending is a character that can walk in any direction. Instead of creating a separate animation for each possible direction, we can create a set of animations for the cardinal directions (up, down, left, right) and then blend between them based on the character's current movement direction.
+
+An extra procedural animation can be applied to the character's upper body using a blend tree, allowing the player to aim in any direction while moving. This is a common technique in third-person shooter games, where the character's movement and aiming are controlled independently.
+
 \vspace{60pt}
 
 \subsection{Frame animations}
@@ -251,3 +273,11 @@ There are many parameters that can be adjusted to change the behavior of the flo
 \end{table}
 
 The deviation metric is not defined for this algorithm, as it is not deterministic. The performance is also not strictly \(O(n^2)\) due to the spatial grid optimization; in theory, the best case achievable is \(O(n \log n)\).
+
+\subsection{Inverse kinematics}
+\label{subsec:inverse-forward-kinematics}
+
+Inverse kinematics is a technique often used to animate limbs or other articulated structures. It involves calculating the positions and orientations of the individual segments of a structure based on the desired position of the end effector (e.g., a hand or foot). This is often used in character animation to ensure that a character's hand reaches a specific point in space, such as when grabbing an object.
+
+Its most common use case, seen in many video games, is to ensure a character's feet remain in contact with the ground while walking on uneven terrain. This can be achieved by using inverse kinematics to adjust the position of the character's legs based on the height of the ground at each foot. When game developers create stairs, they often use a sloped collision surface and apply inverse kinematics to the character's legs so that the feet visually align with the steps, even if the steps themselves are only graphical.
+

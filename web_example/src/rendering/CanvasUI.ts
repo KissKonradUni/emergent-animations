@@ -60,8 +60,8 @@ export abstract class UIElement {
 export class UIContainer extends UIElement {
     private _children: UIElement[] = [];
 
-    constructor(position: Vector2f, size: Vector2f) {
-        super(position, size);
+    constructor(size: Vector2f, position: Vector2f) {
+        super(size, position);
         this.autoPosition = false;
     }
 
