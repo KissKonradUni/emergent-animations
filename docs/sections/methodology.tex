@@ -36,7 +36,7 @@ Feel (\(F\)) is another subjective measurement, which will be based on my person
 
 Lastly, a purely objective measurement: performance (\(P(...)\)). This will be measured in ms, and will be the time the algorithm takes to calculate the position and rotation of the objects for the next frame. Every algorithm mentioned here will be tuned for real-time performance, so the goal is to achieve a frame rate of at least \(60\) FPS, which means the algorithm should take no more than \(16.67\) ms per frame (with leaving some room for rendering). 
 
-If other parameters, like the number of objects and such heavily influence this parameter, I will define an extrapolated function from many measurements. It is similar to the "Big O" notation. It will always be a function defined by me, that tries to estimate the time it takes to run the algorithm for a given input.
+If other parameters, like the number of objects and such heavily influence this parameter, I will define an extrapolated function from many measurements. It is technically the "Big O" notation. It will always be a function defined by me, that tries to estimate the time it takes to run the algorithm for a given input.
 
 \subsection{Summary}
 \label{subsec:methodology-summary}
@@ -56,7 +56,7 @@ If other parameters, like the number of objects and such heavily influence this 
         Repetition    & \(0\) to \(1\) & \(R=0.9\)         & How prone the algorithm is to repetition \\
         Control       & ...            & \(C=\)"high"      & How much control the designer has over the final result \\
         Feel          & \(0\) to \(1\) & \(F=0.2\)         & How natural the motion feels \\
-        Performance   & \(P(...)\)     & \(P(n)=n\cdot k\) & The time the algorithm takes to calculate the next frame (where \(n\) is the number of objects and \(k\) is a constant cost) \\
+        Performance   & \(P(...)\)     & \(P(n)=O(n\cdot k)\) & The time the algorithm takes to calculate the next frame (where \(n\) is the number of objects and \(k\) is a constant cost) \\
     \end{tblr}
     \caption{Summary of measurement methods}
     \label{tab:methodology-summary}

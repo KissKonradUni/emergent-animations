@@ -116,6 +116,8 @@ Interpolation-based animation is one of the most widely used methods in computer
     \label{tab:interpolation-animation-measurements}
 \end{table}
 
+\phantomsection{Depends on the chosen easing function}
+\label{phantom:interpolation-deviation}
 The deviation for this algorithm is defined as the integral of the absolute difference between the linear function and the chosen easing function:
 \begin{align*}
     l(t) = t &: \text{linear function} \\
@@ -257,6 +259,8 @@ Each boid (bird-like object) in the simulation follows these rules to determine 
 
 \Example{https://kisskonraduni.github.io/emergent-animations/examples/rule-based-animations?tab=1}{My implementation can be found here}
 
+\pagebreak
+
 There are many parameters that can be adjusted to change the behavior of the flock. In my implementation, these controls are available in the bottom right corner of the interface. Some combinations of parameters may slow down the simulation significantly, as the algorithm is originally \(O(n^2)\) in complexity. Although I have implemented optimizations using a spatial grid \cite{spatial-grid}, it is still not efficient for very large numbers of boids.
 
 \begin{table}[H]
@@ -278,7 +282,7 @@ There are many parameters that can be adjusted to change the behavior of the flo
 
 The deviation metric is not defined for this algorithm, as it is not deterministic. The performance is also not strictly \(O(n^2)\) due to the spatial grid optimization; in theory, the best case achievable is \(O(n \log n)\).
 
-\vspace{30pt}
+\vspace{60pt}
 
 \subsection{Inverse kinematics}
 \label{subsec:inverse-forward-kinematics}
@@ -291,7 +295,7 @@ This technique was not implemented in this project, but an example could have be
 
 As this technique was not implemented, exact statistics cannot be provided. However, based on its use in many games, it likely achieves a high feel rating and at least decent control.
 
-\vspace{30pt}
+\pagebreak
 
 \subsection{Physics simulation based systems}
 \label{subsec:physics-simulation-based-systems}

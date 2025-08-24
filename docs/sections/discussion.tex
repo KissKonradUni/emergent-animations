@@ -1,0 +1,32 @@
+\pagebreak
+
+\section{Discussion}
+\label{sec:discussion}
+
+In this section, I reflect on the results and techniques presented earlier. I also address a few questions that may arise from the thesis, and suggest directions for further exploration.
+
+	\textbf{Why are some techniques not measured directly?}\\
+Some algorithms, such as physics simulation and rule-based systems, produce results that are highly context-dependent or emergent. Standard metrics like deviation or repetition do not capture their behavior meaningfully. Instead, qualitative analysis or application-specific metrics are more appropriate. These techniques are also heavily implementation-dependent, making it difficult to generalize measurements across different implementations.
+
+	\textbf{Can techniques be combined?}\\
+Yes, many practical animation systems combine multiple techniques, it's very standard in the available tools as of writing. The latest Unreal Engine 5 \cite{unreal-engine-5} character animation system is a great example of a modern game engine that combines many of these techniques to create realistic and dynamic animations.
+
+	\textbf{How important is performance?}\\
+Performance is crucial in real-time applications, such as games or interactive graphics. Algorithms with $O(1)$ or $O(n)$ complexity are preferred for smooth user experiences. More expensive techniques are often reserved for offline rendering or precomputed effects.
+
+	\textbf{What determines the 'feel' of an animation?}\\
+The feel is influenced by timing, motion quality, and how closely the animation matches natural movement. Easing functions, blending, and data-driven approaches can all improve the feel, but the choice of technique should match the desired effect and application.
+
+\subsection{Further exploration}
+\label{subsec:further-exploration}
+
+There are many directions that could be explored beyond the scope of this thesis:
+\begin{itemize}
+	\item \textbf{Procedural generation of animation parameters:} Using machine learning or optimization algorithms to generate animation curves or blending weights automatically.
+	\item \textbf{Real-time adaptation:} Developing systems that adapt animations dynamically based on user input, environment, or other factors.
+	\item \textbf{Advanced physical simulation:} Exploring more complex simulations, such as soft body dynamics, fluids, or crowds, and their integration with traditional animation techniques.
+	\item \textbf{User interfaces for animation control:} Designing intuitive tools for artists and developers to manipulate and combine animation techniques.
+	\item \textbf{Cross-disciplinary applications:} Applying animation algorithms to fields such as scientific visualization, education, or art installations.
+\end{itemize}
+
+These topics offer exciting possibilities for future research and development. I believe that continued exploration in this area will lead to more powerful, flexible, and expressive animation systems.

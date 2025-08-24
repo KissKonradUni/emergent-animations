@@ -1,6 +1,29 @@
-\pagebreak
-
 \section{Results}
 \label{sec:results}
 
-\lipsum[1-3]
+In this section, we summarize and compare the animation techniques discussed previously. Each method has its own strengths, limitations, and areas of application. To provide a clear overview, I present a table with the main techniques and their measured properties, as defined in the previous sections.
+
+\begin{table}[H]
+	\centering
+	\begin{tblr}{
+		colspec={|c|c|c|c|c|c|},
+		vlines = {abovepos = 1, belowpos = 1},
+		hlines,
+		hline{2} = {1}{-}{solid},
+		hline{2} = {2}{-}{solid},
+		row{1} = {font=\bfseries}
+	}
+		Technique & Deviation & Repetition & Control & Feel & Performance \\
+		Functional animation & $0.0$ & $1.0$ & Total & $0.15$ & $O(1)$ \\
+		Interpolation-based & See in \ref{phantom:interpolation-deviation} & $1.0$ & High & $0.8$ & $O(1)$ \\
+		Frame animation & $0.0$ & $1.0$ & Total & N/A & $O(1)$ \\
+		Boids & N/A & $0.2$ & Medium & $0.9$ & $O(n^2)$ \\
+	\end{tblr}
+	\caption{Comparison of main animation techniques and their measured properties.}
+	\label{tab:techniques-comparison}
+\end{table}
+
+Some techniques, such as data-driven animations, blend trees, inverse kinematics, physics simulation, and rule-based systems, are not included in the table above. This is because their properties are either highly context-dependent, not deterministic, or not directly comparable using the same metrics. For example, data-driven and blend tree techniques build upon interpolation, but their deviation and feel depend on the source data and blending parameters. Inverse kinematics and physics-based systems are typically evaluated qualitatively or by simulation accuracy, rather than by simple metrics. Rule-based systems, such as cellular automata, are often used for emergent or unpredictable behaviors, making standard measurements less meaningful.
+
+These techniques are nevertheless important and widely used, but their evaluation requires different approaches, often tailored to the specific application or desired outcome. They are mentioned here for completeness and for a sense of continuity.
+
